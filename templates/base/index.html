@@ -14,14 +14,6 @@
     <ul class="nav navbar-nav">
       <li><a href="{{ url_for('collection.mine') }}">Ma Collection</a></li>
       <li><a href="{{ url_for('echange.echanges') }}">Mes Échanges</a></li>
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Galleries <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a href="{{ url_for('gallerie.ecocups') }}">Écocups</a></li>
-          <li><a href="{{ url_for('gallerie.achievements') }}">Achievements</a></li>
-          <li><a href="{{ url_for('gallerie.stats') }}">Statistiques</a></li>
-        </ul>
-      </li>
     </ul>
 
     <ul class="nav navbar-nav navbar-right">
@@ -39,8 +31,8 @@
 {% endblock %}
 {% block body %}
 <div class="row">
-  <div class="col-md-12">
-    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+  <div class="col-md-offset-3 col-md-6">
+    <div id="carousel-ecocups" class="carousel slide" data-ride="carousel">
       <!-- Indicators -->
       <ol class="carousel-indicators">
         <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
@@ -51,26 +43,38 @@
       <!-- Wrapper for slides -->
       <div class="carousel-inner">
         <div class="item active">
-          <img src="..." alt="...">
+          <img src="http://placehold.it/550x450" alt="...">
           <div class="carousel-caption">
-            ...
+            <h4>Picasso A10 − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a></h4><br/><p>Première écocup 40cl de l’histoire de l’UTC.</p>
+          </div>
+        </div>
+        <div class="item">
+          <img src="http://placehold.it/550x450" alt="...">
+          <div class="carousel-caption">
+            <h4>Escom 6 roses − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a></h4>
+          </div>
+        </div>
+        <div class="item">
+          <img src="http://placehold.it/550x450" alt="...">
+          <div class="carousel-caption">
+            <h4>Picasso P14 − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a></h4>
           </div>
         </div>
         ...
       </div>
 
       <!-- Controls -->
-      <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+      <a class="left carousel-control" href="#carousel-ecocups" data-slide="prev">
         <span class="glyphicon glyphicon-chevron-left"></span>
       </a>
-      <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+      <a class="right carousel-control" href="#carousel-ecocups" data-slide="next">
         <span class="glyphicon glyphicon-chevron-right"></span>
       </a>
     </div>    
   </div>
 </div>
 <div class="row">
-  <div class="col-md-5">
+  <div class="col-md-6">
     <h3>Statistiques</h3>
     <ul>
       <li>23 collections complètes</li>
@@ -79,7 +83,7 @@
       <li>632 échanges réalisés</li>
     </ul>
   </div>
-  <div class="col-md-offset-6 col-md-6">
+  <div class="col-md-6">
     <h3>Derniers échanges</h3>
     <table class="table table-striped table-hover ">
       <thead>
