@@ -5,6 +5,9 @@ from flask import render_template, url_for, redirect, request, session, flash, B
 import conf
 import requests
 from xml.dom.minidom import parseString
+from models import User
+import datetime
+from database import db
 
 bp = Blueprint('cas', __name__, url_prefix='/cas/')
 
@@ -30,9 +33,18 @@ def authenticate():
 	    return redirect(url_for("base.index"))
 	else:
 	    dom = parseString(r.text)
-	    session["username"] = dom.getElementsByTagName("cas:user")[0].firstChild.nodeValue
+	    username = dom.getElementsByTagName("cas:user")[0].firstChild.nodeValue
+	    session["username"] = username
 	    session["logged_in"] = True
 	    flash("Bienvenue !", "success")
+	    existing = User.query.get(username)
+	    if existing is None:
+		user = User(username)
+		db.session.add(user)
+	    else:
+		existing.last_login = datetime.datetime.utcnow()
+
+	    db.session.commit()
 	    return redirect(url_for("base.index"))
 
 @bp.route("logout")
