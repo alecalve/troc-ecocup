@@ -42,7 +42,7 @@ def authenticate():
 		user = User(username)
 		db.session.add(user)
 		db.session.commit()
-		return redirect(url_for("collection.add"))
+		return redirect(url_for("collection.mine"))
 	    else:
 		existing.last_login = datetime.datetime.utcnow()
 
