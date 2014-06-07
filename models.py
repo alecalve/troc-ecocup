@@ -20,15 +20,16 @@ class Ecocup(db.Model):
     asso = db.Column(db.String(50))
     nb_exemplaire = db.Column(db.Integer())
     appreciation = db.Column(db.Integer())
+    commentaires = db.Column(db.String(140))
     
-    collections = db.relationship('Collection', backref='nom_ecocup', lazy='dynamic')
+    collections = db.relationship('Collection', backref='ecocup', lazy='dynamic')
         
     def __repr__(self):
         return '<Ecocup %r>' % self.nom
         
 class Collection(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    user = db.Column(db.String(8), db.ForeignKey('user.login'), index=True)
+    login_user = db.Column(db.String(8), db.ForeignKey('user.login'), index=True)
     nom_ecocup = db.Column(db.String(8), db.ForeignKey('ecocup.nom'), index=True)
     in_collection = db.Column(db.Integer())
     accepte_echange = db.Column(db.Integer())
