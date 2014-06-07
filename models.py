@@ -27,24 +27,24 @@ class Ecocup(db.Model):
         return '<Ecocup %r>' % self.nom
         
 class Collection(db.Model):
-	id = db.Column(db.Integer(), primary_key=True)
-    user = db.Column(db.String(8), index=True, db.ForeignKey('user.login'))
-    nom_ecocup = db.Column(db.String(8), index=True, db.ForeignKey('ecocup.nom'))
+    id = db.Column(db.Integer(), primary_key=True)
+    user = db.Column(db.String(8), db.ForeignKey('user.login'), index=True)
+    nom_ecocup = db.Column(db.String(8), db.ForeignKey('ecocup.nom'), index=True)
     in_collection = db.Column(db.Integer())
     accepte_echange = db.Column(db.Integer())
     souhaite = db.Column(db.Integer())
-	date_mise_a_jour = db.Column(db.DateTime(),default=datetime.datetime.utcnow())
+    date_mise_a_jour = db.Column(db.DateTime(),default=datetime.datetime.utcnow())
         
     def __repr__(self):
         return '<Collection %r>' % self.id
         
 class Echange(db.Model):
-	id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     user1 = db.Column(db.String(8), db.ForeignKey('user.login'))
     user2 = db.Column(db.String(8), db.ForeignKey('user.login'))
     nom_ecocup1 = db.Column(db.String(8), db.ForeignKey('ecocup.nom'))
     nom_ecocup2 = db.Column(db.String(8), db.ForeignKey('ecocup.nom'))
-	date = db.Column(db.DateTime(),default=datetime.datetime.utcnow())
+    date = db.Column(db.DateTime(),default=datetime.datetime.utcnow())
         
     def __repr__(self):
         return '<Echange %r>' % self.id
