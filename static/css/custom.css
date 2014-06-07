@@ -1,0 +1,27 @@
+#carousel-ecocups {
+	width: 550px;
+	height: 450px;
+}
+
+.up {
+	color: green;
+	cursor: pointer;
+}
+
+.up:hover {
+	color: rgba(0,255,0,0.7);
+}
+
+.down {
+	color: red;
+	cursor: pointer;
+}
+
+.down:hover {
+	color: rgba(255,0,0,0.7);
+}
+
+.page-header {
+	margin-top: 0px;
+}
+
