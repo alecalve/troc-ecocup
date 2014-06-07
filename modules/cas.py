@@ -41,6 +41,8 @@ def authenticate():
 	    if existing is None:
 		user = User(username)
 		db.session.add(user)
+		db.session.commit()
+		return redirect(url_for("collection.add"))
 	    else:
 		existing.last_login = datetime.datetime.utcnow()
 
