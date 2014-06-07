@@ -27,7 +27,6 @@ def authenticate():
 	r = requests.get("%sserviceValidate?ticket=%s&service=%s" % (conf.CAS, ticket, conf.HOSTNAME + url_for('cas.authenticate')))
 	
 	if "authenticationFailure" in r.text:
-	    flash("Erreur d’authentification CAS", "danger")
 	    return redirect(url_for("base.index"))
 	else:
 	    dom = parseString(r.text)
