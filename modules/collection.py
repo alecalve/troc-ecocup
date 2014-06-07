@@ -3,9 +3,10 @@
 
 from flask import render_template, url_for, redirect, request, session, flash, Blueprint
 import conf
-from models import User
+from models import User, Ecocup, Collection
 from helpers import user_required
 import datetime
+from sqlalchemy.orm import joinedload
 from database import db
 
 bp = Blueprint('collection', __name__, url_prefix='/collection/')
@@ -16,14 +17,9 @@ def mine():
     """ Affiche la collection de l’utilisateur connecté """
     
     username = session["username"]
+    collections = Collection.query.options(joinedload("nom_ecocup")).filter_by(login_user=session["username"]).all()
+
     return render_template("collection/index.html", **locals())
-
-@bp.route("add")
-def ajout():
-    """ Ajoute une collection quand un utilisateur n’en a pas """
-
-    username = session["username"]
-    return render_template("collection/add.html", **locals())
 
 @bp.route("logout")
 def logout():
