@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+from flask import Flask, render_template, request, abort
+from helpers import register_blueprints
+#~ from database import db
+
+def create_app(create_db=False):
+    """Creates an app by registering blueprints in the modules directory
+    and loading the configuration
+    
+    """
+
+    app = Flask(__name__)
+    app.secret_key = os.urandom(24)
+    register_blueprints(app, "modules", ["modules"])
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:antoine@localhost/facet"
+    #~ db.init_app(app)
+    #~ db.app = app
+#~ 
+    #~ if create_db:
+        #~ db.create_all()
+    
+    return app
