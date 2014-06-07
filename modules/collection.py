@@ -4,7 +4,7 @@
 from flask import render_template, url_for, redirect, request, session, flash, Blueprint
 import conf
 from models import User
-from helpers import 
+from helpers import user_required
 import datetime
 from database import db
 
@@ -15,14 +15,14 @@ bp = Blueprint('collection', __name__, url_prefix='/collection/')
 def mine():
     """ Affiche la collection de l’utilisateur connecté """
     
-	username = session["username"]
+    username = session["username"]
     return render_template("collection/index.html", **locals())
 
 @bp.route("add")
 def ajout():
-	""" Ajoute une collection quand un utilisateur n’en a pas """
+    """ Ajoute une collection quand un utilisateur n’en a pas """
 
-	username = session["username"]
+    username = session["username"]
     return render_template("collection/add.html", **locals())
 
 @bp.route("logout")
