@@ -10,9 +10,15 @@ bp = Blueprint('echange', __name__, url_prefix='/echange/')
 
 @bp.route('')
 @user_required
-def myExchanges():
+def echanges():
 	username = session["username"]
 	return render_template("echange/index.html", **locals())
 
+
+@bp.route('/details')
+@user_required
+def details():
+	username = session["username"]
+	return render_template("echange/details.html", **locals())
 
 
