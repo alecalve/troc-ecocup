@@ -14,14 +14,6 @@
     <ul class="nav navbar-nav">
       <li class="active"><a href="{{ url_for('collection.mine') }}">Ma Collection</a></li>
       <li><a href="{{ url_for('echange.echanges') }}">Mes Échanges</a></li>
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Galleries <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a href="{{ url_for('gallerie.ecocups') }}">Écocups</a></li>
-          <li><a href="{{ url_for('gallerie.achievements') }}">Achievements</a></li>
-          <li><a href="{{ url_for('gallerie.stats') }}">Statistiques</a></li>
-        </ul>
-      </li>
     </ul>
 
     <ul class="nav navbar-nav navbar-right">
@@ -38,4 +30,50 @@
 </div>
 {% endblock %}
 {% block body %}
+<div class="row">
+  <div class="col-md-8">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Écocup</th>
+          <th>Dans la collection</th>
+          <th>Proposée à l’échange</th>
+          <th>Souhaite l’avoir</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="warning">
+          <td>PMDE P10</td>
+          <td><span class="glyphicon glyphicon-ok up"></span></td>
+          <td><span class="glyphicon glyphicon-remove down"></span></td>
+          <td><span class="glyphicon glyphicon-minus"></span></td>
+        </tr>
+        </tr>
+        <tr class="success">
+          <td>Picasso A10</td>
+          <td><span class="glyphicon glyphicon-ok up"></span></td>
+          <td><span class="glyphicon glyphicon-ok up"></span></td>
+          <td><span class="glyphicon glyphicon-minus"></span></td>
+        </tr>
+        <tr class="danger">
+          <td>Escom 6 roses</td>
+          <td><span class="glyphicon glyphicon-remove down"></span></td>
+          <td><span class="glyphicon glyphicon-remove down"></span></td>
+          <td><span class="glyphicon glyphicon-ok up"></span></td>
+        </tr>
+        <tr class="danger">
+          <td>Numéo</td>
+          <td><span class="glyphicon glyphicon-remove down"></span></td>
+          <td><span class="glyphicon glyphicon-remove down"></span></td>
+          <td><span class="glyphicon glyphicon-remove down"></span></td>
+        </tr>
+      </tbody>
+    </table> 
+  </div>
+  <div class="col-md-4 ">
+    <div class="page-header">
+      <h4>Détails de l’écocup</h4>
+    </div>
+  </div>
+</div>
 {% endblock %}
