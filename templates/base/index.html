@@ -45,19 +45,19 @@
         <div class="item active">
           <img src="http://placehold.it/550x450" alt="...">
           <div class="carousel-caption">
-            <h4>Picasso A10 − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a></h4><br/><p>Première écocup 40cl de l’histoire de l’UTC.</p>
+            <h4>Picasso A10 − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a> − <span class="up">+118</span></h4><br/><p>Première écocup 40cl de l’histoire de l’UTC.</p>
           </div>
         </div>
         <div class="item">
           <img src="http://placehold.it/550x450" alt="...">
           <div class="carousel-caption">
-            <h4>Escom 6 roses − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a></h4>
+            <h4>Escom 6 roses − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a> − <span class="up">+224</span></h4>
           </div>
         </div>
         <div class="item">
           <img src="http://placehold.it/550x450" alt="...">
           <div class="carousel-caption">
-            <h4>Picasso P14 − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a></h4>
+            <h4>Picasso P14 − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a> − <span class="up">+23</span></h4>
           </div>
         </div>
         ...
@@ -94,16 +94,13 @@
         </tr>
       </thead>
       <tbody>
+      {% for echange in last_echanges %}
         <tr class="success">
-          <td>2014-06-09 12:05:02</td>
-          <td>PMDE P10</td>
-          <td>Picasso P14</td>
+          <td>{{ echange.date }}</td>
+          <td>{{ echange.nom_ecocup1 }}</td>
+          <td>{{ echange.nom_ecocup2 }}</td>
         </tr>
-        <tr class="success">
-          <td>2014-06-09 12:15:32</td>
-          <td>Ski’UT 2012</td>
-          <td>Escom 6 roses</td>
-        </tr>
+      {% endfor %}
       </tbody>
     </table> 
   </div>
