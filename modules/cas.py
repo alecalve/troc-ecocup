@@ -5,7 +5,7 @@ from flask import render_template, url_for, redirect, request, session, flash, B
 import conf
 import requests
 from xml.dom.minidom import parseString
-from models import User
+from models import User, Ecocup, Collection
 import datetime
 from database import db
 
@@ -42,6 +42,12 @@ def authenticate():
 		user = User(username)
 		db.session.add(user)
 		db.session.commit()
+		ecocups = Ecocup.query.all()
+		for ecocup in ecocups:
+		    element = Collection(login_user=username, nom_ecocup=ecocup.nom, in_collection=0, accepte_echange=0, souhaite=1)
+		    db.session.add(element)
+		db.session.commit()
+		
 		return redirect(url_for("collection.mine"))
 	    else:
 		existing.last_login = datetime.datetime.utcnow()
