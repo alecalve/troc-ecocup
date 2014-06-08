@@ -6,6 +6,7 @@ import datetime
 
 class User(db.Model):
     login = db.Column(db.String(8), primary_key=True)
+    email = db.Column(db.String(100))
     date_join = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
     last_login = db.Column(db.DateTime(),default=datetime.datetime.utcnow())
     
@@ -13,6 +14,7 @@ class User(db.Model):
 
     def __init__(self, login):
         self.login = login
+        self.email = "%s@etu.utc.fr" % login
         
     def __repr__(self):
         return '<User %r>' % self.login
@@ -40,15 +42,17 @@ class Collection(db.Model):
     date_mise_a_jour = db.Column(db.DateTime(),default=datetime.datetime.utcnow())
         
     def __repr__(self):
-        return '<Collection %r>' % self.id
+        return '<Collection %r %r>' % (self.id, self.nom_ecocup, self.in_collection, self.login_user)
         
 class Echange(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user1 = db.Column(db.String(8), db.ForeignKey('user.login'))
     user2 = db.Column(db.String(8), db.ForeignKey('user.login'))
+    #User1 donne ecocup1
     nom_ecocup1 = db.Column(db.String(50), db.ForeignKey('ecocup.nom'))
     nom_ecocup2 = db.Column(db.String(50), db.ForeignKey('ecocup.nom'))
-    date = db.Column(db.DateTime(),default=datetime.datetime.utcnow())
+    date_execution = db.Column(db.DateTime(),default=None)
+    date_creation = db.Column(db.DateTime(),default=datetime.datetime.utcnow())
         
     def __repr__(self):
         return '<Echange %r>' % self.id
