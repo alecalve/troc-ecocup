@@ -1,8 +1,17 @@
 #carousel-ecocups {
-	width: 550px;
 	height: 450px;
 }
 
+.carousel-inner {
+	text-align: center;
+	background: lightgrey;
+}
+.carousel .item > img { display: inline-block; }
+
+
+.navbar input {
+	margin-top: 5px;
+}
 .up {
 	color: green;
 	cursor: pointer;
