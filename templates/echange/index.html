@@ -15,7 +15,9 @@
       <li><a href="{{ url_for('collection.mine') }}">Ma Collection</a></li>
       <li class="active"><a href="{{ url_for('echange.echanges') }}">Mes Échanges</a></li>
     </ul>
-
+    <div class="navbar-form navbar-left">
+      <input class="form-control col-lg-8 input-sm" placeholder="Comparer avec …">
+    </div>
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ username }} <b class="caret"></b></a>
@@ -32,27 +34,109 @@
 {% block body %}
 <div class="row">
   <div class="col-md-12">
+    <div class="page-header">
+      <h4>Échanges en cours <small>(les échanges sont à confirmer <b>après</b> l’échange réel)</small></h4>
+    </div>
+    {% if echanges_en_cours %}
     <table class="table table-striped table-hover">
       <thead>
         <tr>
           <th>Date de l’échange</th>
-          <th>Personne avec qui t’as échangé</th>
-          <th>Écocup donnée</th>
-          <th>Écocup reçue</th>
-          <th>Appréciation donnée</th>
+          <th>Étudiant(e) matché(e)</th>
+          <th>Tu lui donnes</th>
+          <th>Tu reçois</th>
+          <th>Contact</th>
+          <th>Confirmer</th>
+          <th>Annuler</th>
         </tr>
       </thead>
       <tbody>
+        {% for echange in echanges_en_cours %}
         <tr>
-          <td>2014-05-02 14:50:14</td>
-          <td>tisetsyl</td>
-          <td>Picasso P12</td>
-          <td>Numéo</td>
-          <td><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star"></span><span class="glyphicon glyphicon-star-empty"></span><span class="glyphicon glyphicon-star-empty"></span></td>
+          <td>{{echange.date_creation}}</td>
+          <td>{{echange.other.login}}</td>
+          <td>{{echange.donne}}</td>
+          <td>{{echange.recu}}</td>
+          <td><a class="up" href="mailto:{{echange.other.email}}?subject={{ echange.subject }}"><span class="up glyphicon glyphicon-envelope"></span> Contacter</a></td>
+          {% if not echange.date_confirmation %}
+          <td><a href="{{ url_for('echange.confirm', id=echange.id) }}" class="up"><span class="up glyphicon glyphicon-ok"></span> Confirmer l’échange</a></td>
+          {% else %}
+          <td><span class="up glyphicon glyphicon-ok"></span> Vous avez confirmé</a></td>
+          {% endif %}
+          <td><a href="{{ url_for('echange.cancel', id=echange.id) }}"><span class="down glyphicon glyphicon-remove"></span> Annuler l’échange</a></td>
         </tr>
+        {% endfor %}
       </tbody>
-    </table> 
+    </table>
+    {% else %}
+    <p>Pas d’échanges en cours</p>
+    {% endif %}
   </div>
+
+  <div class="col-md-12">
+    <div class="page-header">
+      <h4>Échanges terminés</h4>
+    </div>
+    {% if echanges_termines %}
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Date de l’échange</th>
+          <th>Étudiant(e) matché(e)</th>
+          <th>Tu donnas</th>
+          <th>Tu reçus</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for echange in echanges_termines %}
+        <tr>
+          <td>{{echange.date_creation}}</td>
+          <td>{{echange.other.login}}</td>
+          <td>{{echange.donne}}</td>
+          <td>{{echange.recu}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>Pas d’échanges terminés</p>
+    {% endif %}
+  </div>
+
+  <div class="col-md-12">
+    <div class="page-header">
+      <h4>Échanges annulés</h4>
+    </div>
+    {% if echanges_annules %}
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Date de l’échange</th>
+          <th>Date d’annulation</th>
+          <th>Étudiant(e) matché(e)</th>
+          <th>Tu souhaitais donner</th>
+          <th>Tu pensais recevoir</th>
+          <th>Annulé par</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for echange in echanges_annules %}
+        <tr>
+          <td>{{echange.date_creation}}</td>
+          <td>{{echange.date_cancelled}}</td>
+          <td>{{echange.other.login}}</td>
+          <td>{{echange.donne}}</td>
+          <td>{{echange.recu}}</td>
+          <td>{{echange.canceller}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>Pas d’échanges annulés</p>
+    {% endif %}
+  </div>
+  
 </div>
 {% endblock %}
 
