@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_tags.html" import boolean %}
 {% block title %}Ma collection{% endblock %}
 {% block nav %}
 <div class="navbar navbar-inverse">
@@ -15,7 +16,9 @@
       <li class="active"><a href="{{ url_for('collection.mine') }}">Ma Collection</a></li>
       <li><a href="{{ url_for('echange.echanges') }}">Mes Échanges</a></li>
     </ul>
-
+    <div class="navbar-form navbar-left">
+      <input class="form-control col-lg-8 input-sm" placeholder="Comparer avec …">
+    </div>
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ username }} <b class="caret"></b></a>
@@ -31,49 +34,207 @@
 {% endblock %}
 {% block body %}
 <div class="row">
-  <div class="col-md-8">
+  <div class="col-md-8" id="left">
     <table class="table table-striped table-hover">
       <thead>
         <tr>
           <th>Écocup</th>
-          <th>Dans la collection</th>
-          <th>Proposée à l’échange</th>
-          <th>Souhaite l’avoir</th>
+          <th class="header" data-origin="0" data-type="collection">Dans la collection</th>
+          <th class="header" data-origin="0" data-type="echange">Proposée à l’échange</th>
+          <th class="header" data-origin="0" data-type="souhaite">Souhaite l’avoir</th>
         </tr>
       </thead>
       <tbody>
-        <tr class="warning">
-          <td>PMDE P10</td>
-          <td><span class="glyphicon glyphicon-ok up"></span></td>
-          <td><span class="glyphicon glyphicon-remove down"></span></td>
-          <td><span class="glyphicon glyphicon-minus"></span></td>
+        {% for collec in collections %}
+        {% if collec.in_collection %}
+        <tr id="{{ collec.id }}" class="success">
+        {% else %}
+        <tr id="{{ collec.id }}" class="danger">
+        {% endif %}
+          <td>{{ collec.ecocup_ref.nom }}</td>
+          <td class="data" data-type="collection" data-value="{{ collec.in_collection }}" data-id="{{ collec.id }}">{{ boolean(collec.in_collection) }}</td>
+          <td class="data" data-type="echange" data-value="{{ collec.accepte_echange }}" data-id="{{ collec.id }}">{{ boolean(collec.accepte_echange) }}</td>
+          {% if collec.in_collection %}
+          <td class="data" data-type="souhaite" data-value="{{ collec.souhaite }}" data-id="{{ collec.id }}"><span class="glyphicon glyphicon-minus"></span></td>
+          {% else %}
+          <td class="data" data-type="souhaite" data-value="{{ collec.souhaite }}" data-id="{{ collec.id }}">{{ boolean(collec.souhaite) }}</td>
+          {% endif %}
         </tr>
-        </tr>
-        <tr class="success">
-          <td>Picasso A10</td>
-          <td><span class="glyphicon glyphicon-ok up"></span></td>
-          <td><span class="glyphicon glyphicon-ok up"></span></td>
-          <td><span class="glyphicon glyphicon-minus"></span></td>
-        </tr>
-        <tr class="danger">
-          <td>Escom 6 roses</td>
-          <td><span class="glyphicon glyphicon-remove down"></span></td>
-          <td><span class="glyphicon glyphicon-remove down"></span></td>
-          <td><span class="glyphicon glyphicon-ok up"></span></td>
-        </tr>
-        <tr class="danger">
-          <td>Numéo</td>
-          <td><span class="glyphicon glyphicon-remove down"></span></td>
-          <td><span class="glyphicon glyphicon-remove down"></span></td>
-          <td><span class="glyphicon glyphicon-remove down"></span></td>
-        </tr>
+        {% endfor %}
       </tbody>
     </table> 
   </div>
-  <div class="col-md-4 ">
+  <div class="col-md-4" id="sticky">
+    <div id="modifications" class="alert alert-warning fade in text-center">
+      <a href="{{url_for('collection.mine')}}"><button type="button" id="annuler" class="btn btn-primary">Annuler</button></a>
+      <button type="button" id="submit" class="btn btn-success">Valider les modifications</button>
+    </div>
     <div class="page-header">
       <h4>Détails de l’écocup</h4>
     </div>
+    <div class="text-center">
+      <img id="ecoImg" src="http://placehold.it/220x180" alt="...">
+      <p id="ecoName">Picasso P10</p>
+    </div>
   </div>
 </div>
+<form id="form" method="post" action="{{ url_for('collection.update')}}"><input id="json" type="text" name="json"/></form>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+
+	$("document").ready(function () {
+    $("#modifications").hide();
+    $("#form").hide();
+    if (!!$('#sticky').offset()) { // make sure ".sticky" element exists
+ 
+      var stickyTop = $('#sticky').offset().top; // returns number
+      var originalWidth = $('#sticky').width();
+   
+      $(window).scroll(function(){ // scroll event
+   
+        var windowTop = $(window).scrollTop(); // returns number
+        if (stickyTop < windowTop){
+          $('#sticky').css({ position: 'fixed', top: 5,
+                             left: $("#left").width() + ($("body").width() - $(".container").width())/2,
+                             width: originalWidth});
+        } else {
+          $('#sticky').css('position','static');
+        }
+      });    
+    }
+  });
+
+	var refresh = function() {
+    $(".data").each(function () {
+      $(this).empty();
+      var value = $(this).data("value")
+			if (value == 1) {
+				$(this).html('<span class="glyphicon glyphicon-ok up"></span>');
+      } else {
+        $(this).html('<span class="glyphicon glyphicon-remove down"></span>');
+      }
+
+      if ($(this).data("type") == "collection") {
+        if ($(this).parent().hasClass("modified")) {
+          $(this).parent().removeClass();
+          if (value) {
+            $(this).parent().addClass("success");
+          } else {
+            $(this).parent().addClass("danger");
+          }
+          $(this).parent().addClass("modified");
+        } else {
+          $(this).parent().removeClass();
+          if (value) {
+            $(this).parent().addClass("success");
+          } else {
+            $(this).parent().addClass("danger");
+          }
+        }
+    }
+
+      if (($(this).data("type") == "souhaite") && $(this).parent().hasClass("success")) {
+        $(this).html('<span class="glyphicon glyphicon-minus"></span>');
+      }
+
+    });
+  }
+	
+  $(".data").click(function () {
+    $("#modifications").show();
+    var type = $(this).data("type");
+    var value = $(this).data("value");
+    
+
+    if (type == "collection") {      
+      if (value) {
+        $(this).data("value", 0);
+      } else {
+        $(this).data("value", 1);
+      }
+      $(this).parent().addClass("modified");
+    }
+
+    if (type == "echange") {
+      $(this).parent().removeClass();
+      if (value) {
+        $(this)
+        $(this).data("value", 0);
+        $(this).prev().data("value", 0);
+        $(this).next().data("value", 1);
+      } else {
+        $(this).data("value", 1);
+        $(this).prev().data("value", 1);
+        $(this).next().data("value", 0);
+      }
+      
+      $(this).parent().addClass("modified");
+    }
+
+    if (type == "souhaite" && $(this).parent().hasClass("danger")) {
+      if (value) {
+        $(this).data("value", 0);
+      } else {
+        $(this).data("value", 1);
+      }
+      $(this).parent().addClass("modified");
+    }
+
+    refresh();
+  });
+
+  $("tbody tr").hover(function() {
+    console.log($(this).children().first().text());
+    $("#ecoName").text($(this).children().first().text());
+
+  }, function() {});
+
+  $("#submit").click(function() {
+		
+    var modifications = {};
+    
+    $(".modified").each(function () {
+			var parentId = $(this).attr("id");
+      modifications[parentId] = [];
+      $(this).children('.data').each(function() {
+        var type = $(this).data("type");
+        var value = $(this).data("value");
+        var id = $(this).data("id");              
+        var modif = new Object();
+        modif.type = type;
+        modif.value = value;
+        modifications[parentId].push(modif);
+      });
+
+    });
+
+    $("#json").val(JSON.stringify(modifications));
+    $("#form").submit();
+    
+  });
+
+  $(".header").dblclick(function() {
+    var type=$(this).data("type");
+    var origin=$(this).data("origin");
+    if (type == "echange") {
+      $("td[data-type=echange]").each(function() { if (origin) { $(this).data("value", 0); } else { $(this).data("value", 1); }});
+      $("td[data-type=collection]").each(function() { if (origin) { $(this).data("value", 0); } else { $(this).data("value", 1); }});
+      $("td[data-type=souhaite]").each(function() { if (origin) { $(this).data("value", 1); } else { $(this).data("value", 0); }});
+      $(this).data("origin", !origin);
+    }
+    if (type == "collection") {
+      $("td[data-type=collection]").each(function() { if (origin) { $(this).data("value", 0); } else { $(this).data("value", 1); }});
+      $("td[data-type=souhaite]").each(function() { if (origin) { $(this).data("value", 1); } else { $(this).data("value", 0); }});
+      $("td[data-type=echange]").each(function() { if (origin) { $(this).data("value", 0); }});
+      $(this).data("origin", !origin);
+    }
+    if (type == "souhaite") {
+      $("td[data-type=souhaite]").each(function() { if (origin) { $(this).data("value", 1); } else { $(this).data("value", 0); }});
+      $(this).data("origin", !origin);
+    }
+    refresh();
+  });
+</script>
 {% endblock %}
