@@ -163,7 +163,7 @@ def cancel(id):
   echange.date_cancelled = datetime.datetime.utcnow()
   echange.canceller = username
 
-  if echange.date_conf1 is not None and echange.conf2 is not None:
+  if echange.date_conf1 is not None and echange.date_conf2 is not None:
     echange.date_execution = datetime.datetime.utcnow()
 
   ecocup1 = Collection.query.filter_by(login_user=echange.user1, ecocup=echange.ecocup1).first()
