@@ -35,8 +35,6 @@ def authenticate():
 	    dom = parseString(r.text)
 	    username = dom.getElementsByTagName("cas:user")[0].firstChild.nodeValue
 	    session["username"] = username
-	    session["logged_in"] = True
-	    flash("Bienvenue !", "success")
 	    existing = User.query.get(username)
 	    if existing is None:
 		user = User(username)
@@ -44,7 +42,7 @@ def authenticate():
 		db.session.commit()
 		ecocups = Ecocup.query.all()
 		for ecocup in ecocups:
-		    element = Collection(login_user=username, nom_ecocup=ecocup.nom, in_collection=0, accepte_echange=0, souhaite=1)
+		    element = Collection(login_user=username, ecocup=ecocup.id, in_collection=0, accepte_echange=0, souhaite=1)
 		    db.session.add(element)
 		db.session.commit()
 		
@@ -53,6 +51,8 @@ def authenticate():
 		existing.last_login = datetime.datetime.utcnow()
 
 	    db.session.commit()
+	    session["logged_in"] = True
+	    flash("Bienvenue !", "success")
 	    return redirect(url_for("base.index"))
 
 @bp.route("logout")
