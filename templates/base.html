@@ -29,6 +29,13 @@
   </div>
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script>
+    $("div.navbar-form input").keyup(function(event){
+      if(event.keyCode == 13){
+        window.location.href = '/collection/compare/' + $(this).val();
+      }
+    });
+  </script>
   {% block extrajs %}{% endblock %}
 </body>
 </html>
