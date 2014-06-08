@@ -1,0 +1,9 @@
+{% macro boolean(bool) %}
+  {% if bool %}
+  <span class="glyphicon glyphicon-ok up"></span>
+  {% else %}
+  <span class="glyphicon glyphicon-remove down"></span>
+  {% endif %}
+{% endmacro %}
+
+{% macro make_name(string) %}{{string|replace("é", "e")|replace("'", "")|replace("ô", "o")|replace("?", "")|replace(" ", "")|lower}}{% endmacro %}
