@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_tags.html" import make_name %}
 {% block title %}Accueil Troc’Écocup{% endblock %}
 {% block nav %}
 <div class="navbar navbar-inverse">
@@ -15,7 +16,9 @@
       <li><a href="{{ url_for('collection.mine') }}">Ma Collection</a></li>
       <li><a href="{{ url_for('echange.echanges') }}">Mes Échanges</a></li>
     </ul>
-
+    <div class="navbar-form navbar-left">
+      <input class="form-control col-lg-8 input-sm" placeholder="Comparer avec …">
+    </div>
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ username }} <b class="caret"></b></a>
@@ -31,36 +34,29 @@
 {% endblock %}
 {% block body %}
 <div class="row">
-  <div class="col-md-offset-3 col-md-6">
+  <div class="col-md-12">
     <div id="carousel-ecocups" class="carousel slide" data-ride="carousel">
       <!-- Indicators -->
       <ol class="carousel-indicators">
-        <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-        <li data-target="#carousel-example-generic" data-slide-to="1"></li>
-        <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+          {% for i, ecocup in ecocups %}
+          <li data-target="#carousel-ecocups" data-slide-to="{{i}}"></li>
+          {% endfor %}
       </ol>
 
       <!-- Wrapper for slides -->
-      <div class="carousel-inner">
+      <div class="carousel-inner text-center">
+        {% for i, ecocup in ecocups %}
+        {% if loop.first %}
         <div class="item active">
-          <img src="http://placehold.it/550x450" alt="...">
-          <div class="carousel-caption">
-            <h4>Picasso A10 − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a> − <span class="up">+118</span></h4><br/><p>Première écocup 40cl de l’histoire de l’UTC.</p>
-          </div>
-        </div>
+        {% else %}
         <div class="item">
+        {% endif %}
           <img src="http://placehold.it/550x450" alt="...">
           <div class="carousel-caption">
-            <h4>Escom 6 roses − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a> − <span class="up">+224</span></h4>
+            <h4>{{ ecocup.nom }}− <a data-id="{{ecocup.id}}" class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a data-id="{{ecocup.id}}" class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a> − <span class="up" id="{{ecocup.id}}">{{ecocup.appreciation}}</span></h4><br/><p>{{ecocup.commentaires}}</p>
           </div>
         </div>
-        <div class="item">
-          <img src="http://placehold.it/550x450" alt="...">
-          <div class="carousel-caption">
-            <h4>Picasso P14 − <a class="up"><span class="glyphicon glyphicon glyphicon-thumbs-up"></span></a> <a class="down"><span class="glyphicon glyphicon glyphicon-thumbs-down"></span></a> − <span class="up">+23</span></h4>
-          </div>
-        </div>
-        ...
+        {% endfor %}
       </div>
 
       <!-- Controls -->
@@ -97,12 +93,37 @@
       {% for echange in last_echanges %}
         <tr class="success">
           <td>{{ echange.date }}</td>
-          <td>{{ echange.nom_ecocup1 }}</td>
-          <td>{{ echange.nom_ecocup2 }}</td>
+          <td>{{ echange.ecocup1_ref.nom }}</td>
+          <td>{{ echange.ecocup2_ref.nom }}</td>
         </tr>
       {% endfor %}
       </tbody>
     </table> 
   </div>
 </div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+  $("a.up").click(function() {
+    var id = $(this).data("id");
+    $.getJSON("/like/" + id, function(data) {
+      console.log(data.appreciation);
+      if (!data.error) {
+        $("#"+id).text(data.appreciation);
+      }
+    });
+  });
+
+  $("a.down").click(function() {
+    var id = $(this).data("id");
+    $.getJSON("/dislike/" + id, function(data) {
+      console.log(data.appreciation);
+      if (!data.error) {
+        $("#"+id).text(data.appreciation);
+      }
+    });
+  });
+
+</script>
 {% endblock %}
