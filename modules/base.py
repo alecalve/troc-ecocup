@@ -14,7 +14,7 @@ bp = Blueprint('base', __name__, url_prefix='/')
 @user_required
 def index():
 	username = session["username"]
-	last_echanges = Echange.query.order_by(Echange.date).limit(10)
+	last_echanges = Echange.query.order_by(Echange.date_execution).limit(10)
 	
 	return render_template("base/index.html", **locals())
 
