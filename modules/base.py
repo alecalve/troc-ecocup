@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import render_template, url_for, redirect, request, session, flash, Blueprint, jsonify
-import conf
+from flask import render_template, session, Blueprint, jsonify
 from helpers import user_required
 from database import db
 from models import Ecocup, Echange, Like
@@ -14,9 +13,10 @@ bp = Blueprint('base', __name__, url_prefix='/')
 @user_required
 def index():
   username = session["username"]
-  last_echanges = Echange.query.filter(Echange.date_execution!=None).order_by(Echange.date_execution).limit(10)
+  last_echanges = Echange.query.filter(Echange.date_execution is not None).order_by(Echange.date_execution).limit(10)
   ecocups = list(enumerate(Ecocup.query.all()))
   return render_template("base/index.html", **locals())
+
 
 @bp.route('like/<int:ecocup>')
 @user_required
@@ -53,6 +53,7 @@ def dislike(ecocup):
   ecocup = Ecocup.query.get(ecocup)
   if ecocup is None:
     return jsonify({"error": True})
+
   db.session.commit()
   ecocup.appreciation = sum(map(lambda l: l.valeur, Like.query.filter_by(ecocup=ecocup.id).all()))
   db.session.commit()

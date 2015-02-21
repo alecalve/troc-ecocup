@@ -2,15 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import os
-from flask import Flask, render_template, request, abort
+from flask import Flask
 from helpers import register_blueprints
 from database import db
 import conf
 
+
 def create_app(create_db=False):
     """Creates an app by registering blueprints in the modules directory
     and loading the configuration
-    
+
     """
 
     app = Flask(__name__)
@@ -23,5 +24,5 @@ def create_app(create_db=False):
 
     if create_db:
         db.create_all()
-    
+
     return app
