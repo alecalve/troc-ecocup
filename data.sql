@@ -7,6 +7,7 @@ INSERT INTO `ecocup` (`nom`, `semestre`, `asso`, `nb_exemplaire`, `appreciation`
 ('Picasso P13', 'P13', 'Picasso', 1600, 0, ''),
 ('Picasso Crabs P13', 'P13', 'Picasso', 1200, 0, 'Deuxième écocup du Pic en P13'),
 ('Picasso P14', 'P14', 'Picasso', 2000, 0, ''),
+('Picasso A14', 'A14', 'Picasso', 2000, 0, 'Rétroscopic'),
 ('Ski''UT P12', 'P12', 'Ski''UTC', 400, 0, ''),
 ('Ski''UTC P13', 'P13', 'Ski''UTC', 800, 0, ''),
 ('Ski''UTC P14', 'P14', 'Ski''UTC', 800, 0, ''),
@@ -26,7 +27,8 @@ INSERT INTO `ecocup` (`nom`, `semestre`, `asso`, `nb_exemplaire`, `appreciation`
 ('Festupic P13', 'P13', 'Festupic', 800, 0, ''),
 ('Festupic P14', 'P14', 'Festupic', 800, 0, ''),
 ('UTCéenne A12', 'A12', 'Etuville', 0, 0, ''),
-('UTCéenne A13', 'A13', 'Etuville', 0, 0, ''),
+('UTCéenne A13', 'A13', 'Etuville', 0, 0, 'Astérix'),
+('UTCéenne A14', 'A14', 'Etuville', 0, 0, 'Égyptiens'),
 ('Numéo P12', 'P12', 'Numéo', 1200, 0, ''),
 ('PAE A12', 'A12', 'PAE', 1200, 0, ''),
 ('Profit''rôles A12', 'A12', 'Profit''rôles', 800, 0, ''),
@@ -36,4 +38,7 @@ INSERT INTO `ecocup` (`nom`, `semestre`, `asso`, `nb_exemplaire`, `appreciation`
 ('TUC A13', 'A13', 'TUC', 1200, 0, ''),
 ('Tremplin Rock', 'P14', 'Imaginarium', 800, 0, ''),
 ('Imaginarium Festival 2014', 'P14', 'Imaginarium', 800, 0, ''),
-('Es tu solidaire ?', 'P14', 'PSEC', 0, 0, '');
+('Es tu solidaire ?', 'P14', 'PSEC', 0, 0, ''),
+('SDF P14', 'P14', 'SDF', 0, 0, 'Mario'),
+('Polar A14', 'A14', 'Polar', 0, 0, ''),
+('Pic générique A14', 'A14', 'Picasso', 2000, 0, '');
