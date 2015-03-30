@@ -38,23 +38,22 @@
           </ul>
         </div>
       </div>
-
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div class="row">
-            <div class="col-md-12">
-            {% for category, message in messages %}
-              <div class="alert alert-{{category}} fade in">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              </div>
-            {% endfor %}
-            </div>
-          </div>
-        {% endif %}
-      {% endwith %}
-      {% block body %}{% endblock %}
     </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="row">
+      <div class="col-md-12">
+      {% for category, message in messages %}
+        <div class="alert alert-{{category}} fade in">
+          {{ message }}
+          <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+    {% block body %}{% endblock %}
   </div>
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
