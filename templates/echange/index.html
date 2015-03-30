@@ -1,36 +1,5 @@
 {% extends "base.html" %}
 {% block title %}Mes derniers échanges{% endblock %}
-{% block nav %}
-<div class="navbar navbar-inverse">
-  <div class="navbar-header">
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-inverse-collapse">
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <a class="navbar-brand" href="{{ url_for('base.index') }}">Troc’Écocup</a>
-  </div>
-  <div class="navbar-collapse collapse navbar-inverse-collapse">
-    <ul class="nav navbar-nav">
-      <li><a href="{{ url_for('collection.mine') }}">Ma Collection</a></li>
-      <li class="active"><a href="{{ url_for('echange.echanges') }}">Mes Échanges</a></li>
-    </ul>
-    <div class="navbar-form navbar-left">
-      <input class="form-control col-lg-8 input-sm" placeholder="Comparer avec …">
-    </div>
-    <ul class="nav navbar-nav navbar-right">
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ username }} <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a href="{{ url_for('profil.me') }}">Mon profil</a></li>
-          <li class="divider"></li>
-          <li><a href="{{ url_for('cas.logout') }}">Déconnection</a></li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-</div>
-{% endblock %}
 {% block body %}
 <div class="row">
   <div class="col-md-12">
