@@ -21,13 +21,13 @@ class User(db.Model):
         return '<User %r>' % self.login
 
 
-class Echange(db.Model):
+class Exchange(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user1 = db.Column(db.String(8), db.ForeignKey('user.login'))
     user2 = db.Column(db.String(8), db.ForeignKey('user.login'))
-    # User1 donne ecocup1
-    ecocup1 = db.Column(db.Integer(), db.ForeignKey('ecocup.id'))
-    ecocup2 = db.Column(db.Integer(), db.ForeignKey('ecocup.id'))
+    # User1 donne good1
+    good1 = db.Column(db.Integer(), db.ForeignKey('good.id'))
+    good2 = db.Column(db.Integer(), db.ForeignKey('good.id'))
     date_execution = db.Column(db.DateTime(), default=None)
     date_conf1 = db.Column(db.DateTime(), default=None)
     date_conf2 = db.Column(db.DateTime(), default=None)
@@ -39,7 +39,7 @@ class Echange(db.Model):
         return '<Echange %r>' % self.id
 
 
-class Ecocup(db.Model):
+class Good(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     nom = db.Column(db.String(50))
     semestre = db.Column(db.String(3))
@@ -48,31 +48,31 @@ class Ecocup(db.Model):
     appreciation = db.Column(db.Integer())
     commentaires = db.Column(db.String(140))
 
-    collections = db.relationship('Collection', backref='ecocup_ref', lazy='dynamic')
-    echanges_1 = db.relationship('Echange', backref='ecocup1_ref', foreign_keys=[Echange.ecocup1], lazy='dynamic')
-    echanges_2 = db.relationship('Echange', backref='ecocup2_ref', foreign_keys=[Echange.ecocup2], lazy='dynamic')
+    collections = db.relationship('Collection', backref='good_ref', lazy='dynamic')
+    exchanges_1 = db.relationship('Exchange', backref='good1_ref', foreign_keys=[Exchange.good1], lazy='dynamic')
+    exchanges_2 = db.relationship('Exchange', backref='good2_ref', foreign_keys=[Exchange.good2], lazy='dynamic')
 
     def __repr__(self):
-        return '<Ecocup %r>' % self.id
+        return '<Good %r>' % self.id
 
 
 class Collection(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     login_user = db.Column(db.String(8), db.ForeignKey('user.login'), index=True)
-    ecocup = db.Column(db.Integer(), db.ForeignKey('ecocup.id'), index=True)
+    good = db.Column(db.Integer(), db.ForeignKey('good.id'), index=True)
     in_collection = db.Column(db.Integer())
     accepte_echange = db.Column(db.Integer())
     souhaite = db.Column(db.Integer())
     date_mise_a_jour = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
 
     def __repr__(self):
-        return '<Collection %r %r>' % (self.id, self.nom_ecocup, self.in_collection, self.login_user)
+        return '<Collection %r>' % self.id
 
 
 class Like(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user = db.Column(db.String(8), db.ForeignKey('user.login'))
-    ecocup = db.Column(db.Integer())
+    good = db.Column(db.Integer())
     valeur = db.Column(db.Integer())
 
     def __repr__(self):
