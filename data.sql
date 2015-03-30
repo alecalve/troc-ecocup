@@ -1,4 +1,4 @@
-INSERT INTO `ecocup` (`nom`, `semestre`, `asso`, `nb_exemplaire`, `appreciation`, `commentaires`) VALUES
+INSERT INTO `good` (`nom`, `semestre`, `asso`, `nb_exemplaire`, `appreciation`, `commentaires`) VALUES
 ('Picasso A10', 'A10', 'Picasso', 1200, 0, ''),
 ('Picasso P11', 'P11', 'Picasso', 1200, 0, ''),
 ('Picasso A11', 'A11', 'Picasso', 1200, 0, ''),

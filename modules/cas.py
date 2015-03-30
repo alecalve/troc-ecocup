@@ -5,7 +5,7 @@ from flask import url_for, redirect, request, session, flash, Blueprint
 import conf
 import requests
 from xml.dom.minidom import parseString
-from models import User, Ecocup, Collection
+from models import User, Good, Collection
 import datetime
 from database import db
 
@@ -20,6 +20,7 @@ def login():
         return redirect(url_for("base.index"))
 
     if not request.args.get('ticket'):
+        print(conf.CAS)
         return redirect("%slogin?service=%s" % (conf.CAS, conf.HOSTNAME + url_for('cas.authenticate')))
 
 
@@ -42,9 +43,9 @@ def authenticate():
             user = User(username)
             db.session.add(user)
             db.session.commit()
-            ecocups = Ecocup.query.all()
-            for ecocup in ecocups:
-                element = Collection(login_user=username, ecocup=ecocup.id, in_collection=0, accepte_echange=0, souhaite=1)
+            goods = Good.query.all()
+            for good in goods:
+                element = Collection(login_user=username, good=good.id, in_collection=0, accepte_echange=0, souhaite=1)
                 db.session.add(element)
             db.session.commit()
 

@@ -3,7 +3,7 @@
 
 from flask import render_template, url_for, redirect, session, flash, Blueprint
 from helpers import user_required
-from models import Echange, User, Collection
+from models import Exchange, User, Collection
 from database import db
 import datetime
 from sqlalchemy import or_
@@ -13,16 +13,13 @@ bp = Blueprint('echange', __name__, url_prefix='/echange/')
 
 def rewrite_echanges(echanges):
     e = []
-    print "dans la fonction", echanges
     for echange in echanges:
-        print echange
-        print len(echanges)
         other = echange.user1 if echange.user1 != session[
             "username"] else echange.user2
         other = User.query.get(other)
         i = 1 if session["username"] == echange.user1 else 2
-        donne = echange.ecocup1_ref.nom if i == 1 else echange.ecocup2_ref.nom
-        recu = echange.ecocup2_ref.nom if i == 1 else echange.ecocup1_ref.nom
+        donne = echange.good1_ref.nom if i == 1 else echange.good2_ref.nom
+        recu = echange.good2_ref.nom if i == 1 else echange.good1_ref.nom
         confirm = echange.date_conf1 if i == 1 else echange.date_conf2
         e.append({
             "date_creation": echange.date_creation,
@@ -44,19 +41,19 @@ def rewrite_echanges(echanges):
 def echanges():
     username = session["username"]
 
-    r_echanges_en_cours = Echange.query.filter(or_(Echange.user1 == username, Echange.user2 == username)).filter_by(
+    r_echanges_en_cours = Exchange.query.filter(or_(Exchange.user1 == username, Exchange.user2 == username)).filter_by(
         date_cancelled=None, date_execution=None).all()
-    print "requete", r_echanges_en_cours
+
     echanges_en_cours = rewrite_echanges(
         r_echanges_en_cours) if r_echanges_en_cours else None
 
-    r_echanges_termines = Echange.query.filter(Echange.date_execution is not None, or_(
-        Echange.user2 == username, Echange.user1 == username)).all()
+    r_echanges_termines = Exchange.query.filter(Exchange.date_execution is not None, or_(
+        Exchange.user2 == username, Exchange.user1 == username)).all()
     echanges_termines = rewrite_echanges(
         r_echanges_termines) if r_echanges_termines else None
 
-    r_echanges_annules = Echange.query.filter(Echange.date_cancelled is not None, or_(
-        Echange.user2 == username, Echange.user1 == username)).all()
+    r_echanges_annules = Exchange.query.filter(Exchange.date_cancelled is not None, or_(
+        Exchange.user2 == username, Exchange.user1 == username)).all()
     echanges_annules = rewrite_echanges(
         r_echanges_annules) if r_echanges_annules else None
 
@@ -68,13 +65,13 @@ def echanges():
 def compute():
     username = session["username"]
     requete = """
-SELECT c1.login_user AS u1, c2.login_user AS u2, c1.ecocup AS e1
+SELECT c1.login_user AS u1, c2.login_user AS u2, c1.good AS e1
 FROM `collection` c1, collection c2
 WHERE (
 c1.login_user = "%s"
 OR c2.login_user = "%s"
 )
-AND c1.ecocup = c2.ecocup
+AND c1.good = c2.good
 AND c1.souhaite = 1
 AND c2.accepte_echange =1;
 """ % (username, username,)
@@ -86,7 +83,6 @@ AND c2.accepte_echange =1;
         return redirect(url_for("collection.mine"))
 
     real_matchs = []
-    print matches
     for match1 in matches:
         correspondant = [m for m in matches if m[1] == match1[0]]
         if len(correspondant) == 0:
@@ -96,46 +92,45 @@ AND c2.accepte_echange =1;
         matches.remove(correspondant)
         matches.remove(match1)
 
-    print real_matchs
     for match in real_matchs:
-        echange = Echange(
-            user1=match[0], ecocup1=match[1], user2=match[2], ecocup2=match[3])
+        echange = Exchange(
+            user1=match[0], good1=match[1], user2=match[2], good2=match[3])
 
         # Écocup que donne user1 (match[1])
-        ecocup1 = Collection.query.filter_by(
-            login_user=match[0], ecocup=match[1]).first()
+        good1 = Collection.query.filter_by(
+            login_user=match[0], good=match[1]).first()
         # Écocup que reçoit user1 (match[3])
-        ecocup12 = Collection.query.filter_by(
-            login_user=match[0], ecocup=match[3]).first()
+        good12 = Collection.query.filter_by(
+            login_user=match[0], good=match[3]).first()
 
-        ecocup1.in_collection = 0
-        ecocup1.souhaite = 0
-        ecocup1.accepte_echange = 0
+        good1.in_collection = 0
+        good1.souhaite = 0
+        good1.accepte_echange = 0
 
-        ecocup12.in_collection = 1
-        ecocup12.souhaite = 0
-        ecocup12.accepte_echange = 0
+        good12.in_collection = 1
+        good12.souhaite = 0
+        good12.accepte_echange = 0
 
         # Écocup que donne user2 (match[3])
-        ecocup2 = Collection.query.filter_by(
-            login_user=match[2], ecocup=match[3]).first()
+        good2 = Collection.query.filter_by(
+            login_user=match[2], good=match[3]).first()
         # Écocup que reçoit user2 (match[3])
-        ecocup21 = Collection.query.filter_by(
-            login_user=match[2], ecocup=match[1]).first()
+        good21 = Collection.query.filter_by(
+            login_user=match[2], good=match[1]).first()
 
-        ecocup2.in_collection = 0
-        ecocup2.souhaite = 0
-        ecocup2.accepte_echange = 0
+        good2.in_collection = 0
+        good2.souhaite = 0
+        good2.accepte_echange = 0
 
-        ecocup21.in_collection = 1
-        ecocup21.souhaite = 0
-        ecocup21.accepte_echange = 0
+        good21.in_collection = 1
+        good21.souhaite = 0
+        good21.accepte_echange = 0
 
         # On trouve la personne à qui on envoie le mail
         other = match[0] if match[0] != username else match[2]
-        ecocup_connected = match[1] if match[0] == username else match[3]
-        ecocup_non_connected = match[
-            1] if ecocup_connected == match[3] else match[3]
+        good_connected = match[1] if match[0] == username else match[3]
+        good_non_connected = match[
+            1] if good_connected == match[3] else match[3]
 
         user = User.query.get(other)
         connected = User.query.get(username)
@@ -153,7 +148,7 @@ AND c2.accepte_echange =1;
 def confirm(id):
     username = session["username"]
 
-    echange = Echange.query.get(id)
+    echange = Exchange.query.get(id)
 
     if username == echange.user1:
         echange.date_conf1 = datetime.datetime.utcnow()
@@ -174,7 +169,7 @@ def confirm(id):
 def cancel(id):
     username = session["username"]
 
-    echange = Echange.query.get(id)
+    echange = Exchange.query.get(id)
 
     echange.date_cancelled = datetime.datetime.utcnow()
     echange.canceller = username
@@ -182,30 +177,30 @@ def cancel(id):
     if echange.date_conf1 is not None and echange.date_conf2 is not None:
         echange.date_execution = datetime.datetime.utcnow()
 
-    ecocup1 = Collection.query.filter_by(
-        login_user=echange.user1, ecocup=echange.ecocup1).first()
-    ecocup12 = Collection.query.filter_by(
-        login_user=echange.user1, ecocup=echange.ecocup2).first()
-    ecocup2 = Collection.query.filter_by(
-        login_user=echange.user2, ecocup=echange.ecocup2).first()
-    ecocup21 = Collection.query.filter_by(
-        login_user=echange.user2, ecocup=echange.ecocup1).first()
+    good1 = Collection.query.filter_by(
+        login_user=echange.user1, good=echange.good1).first()
+    good12 = Collection.query.filter_by(
+        login_user=echange.user1, good=echange.good2).first()
+    good2 = Collection.query.filter_by(
+        login_user=echange.user2, good=echange.good2).first()
+    good21 = Collection.query.filter_by(
+        login_user=echange.user2, good=echange.good1).first()
 
-    ecocup1.in_collection = 1
-    ecocup1.souhaite = 0
-    ecocup1.accepte_echange = 0
+    good1.in_collection = 1
+    good1.souhaite = 0
+    good1.accepte_echange = 0
 
-    ecocup12.in_collection = 0
-    ecocup12.souhaite = 1
-    ecocup12.accepte_echange = 0
+    good12.in_collection = 0
+    good12.souhaite = 1
+    good12.accepte_echange = 0
 
-    ecocup2.in_collection = 1
-    ecocup2.souhaite = 0
-    ecocup2.accepte_echange = 0
+    good2.in_collection = 1
+    good2.souhaite = 0
+    good2.accepte_echange = 0
 
-    ecocup21.in_collection = 0
-    ecocup21.souhaite = 1
-    ecocup21.accepte_echange = 0
+    good21.in_collection = 0
+    good21.souhaite = 1
+    good21.accepte_echange = 0
 
     db.session.commit()
     flash("Échange annulé", "danger")

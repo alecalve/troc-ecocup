@@ -51,7 +51,7 @@
         {% else %}
         <tr id="{{ collec.id }}" class="danger">
         {% endif %}
-          <td>{{ collec.ecocup_ref.nom }}</td>
+          <td>{{ collec.good_ref.nom }}</td>
           <td class="data" data-type="collection" data-value="{{ collec.in_collection }}" data-id="{{ collec.id }}">{{ boolean(collec.in_collection) }}</td>
           <td class="data" data-type="echange" data-value="{{ collec.accepte_echange }}" data-id="{{ collec.id }}">{{ boolean(collec.accepte_echange) }}</td>
           {% if collec.in_collection %}
@@ -62,7 +62,7 @@
         </tr>
         {% endfor %}
       </tbody>
-    </table> 
+    </table>
   </div>
   <div class="col-md-4" id="sticky">
     <div id="modifications" class="alert alert-warning fade in text-center">
@@ -88,12 +88,12 @@
     $("#modifications").hide();
     $("#form").hide();
     if (!!$('#sticky').offset()) { // make sure ".sticky" element exists
- 
+
       var stickyTop = $('#sticky').offset().top; // returns number
       var originalWidth = $('#sticky').width();
-   
+
       $(window).scroll(function(){ // scroll event
-   
+
         var windowTop = $(window).scrollTop(); // returns number
         if (stickyTop < windowTop){
           $('#sticky').css({ position: 'fixed', top: 5,
@@ -102,7 +102,7 @@
         } else {
           $('#sticky').css('position','static');
         }
-      });    
+      });
     }
   });
 
@@ -141,14 +141,14 @@
 
     });
   }
-	
+
   $(".data").click(function () {
     $("#modifications").show();
     var type = $(this).data("type");
     var value = $(this).data("value");
-    
 
-    if (type == "collection") {      
+
+    if (type == "collection") {
       if (value) {
         $(this).data("value", 0);
       } else {
@@ -169,7 +169,7 @@
         $(this).prev().data("value", 1);
         $(this).next().data("value", 0);
       }
-      
+
       $(this).parent().addClass("modified");
     }
 
@@ -192,16 +192,16 @@
   }, function() {});
 
   $("#submit").click(function() {
-		
+
     var modifications = {};
-    
+
     $(".modified").each(function () {
 			var parentId = $(this).attr("id");
       modifications[parentId] = [];
       $(this).children('.data').each(function() {
         var type = $(this).data("type");
         var value = $(this).data("value");
-        var id = $(this).data("id");              
+        var id = $(this).data("id");
         var modif = new Object();
         modif.type = type;
         modif.value = value;
@@ -212,7 +212,7 @@
 
     $("#json").val(JSON.stringify(modifications));
     $("#form").submit();
-    
+
   });
 
   $(".header").dblclick(function() {

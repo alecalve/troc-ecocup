@@ -16,7 +16,6 @@ def mine():
     """ Affiche la collection de l’utilisateur connecté """
 
     username = session["username"]
-
     collections = Collection.query.filter_by(login_user=session["username"])
 
     return render_template("collection/index.html", **locals())
