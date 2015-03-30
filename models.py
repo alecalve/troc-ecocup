@@ -8,6 +8,7 @@ import datetime
 class User(db.Model):
     login = db.Column(db.String(8), primary_key=True)
     email = db.Column(db.String(100))
+    is_admin = db.Column(db.Boolean(), default=False)
     date_join = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
     last_login = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
 
