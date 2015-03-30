@@ -45,8 +45,9 @@ class Good(db.Model):
     nom = db.Column(db.String(50))
     semestre = db.Column(db.String(3))
     asso = db.Column(db.String(50))
-    nb_exemplaire = db.Column(db.Integer())
-    appreciation = db.Column(db.Integer())
+    nb_exemplaires = db.Column(db.Integer())
+    contenance = db.Column(db.Integer())
+    appreciation = db.Column(db.Integer(), default=0)
     commentaires = db.Column(db.String(140))
 
     collections = db.relationship('Collection', backref='good_ref', lazy='dynamic')
@@ -61,9 +62,9 @@ class Collection(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     login_user = db.Column(db.String(8), db.ForeignKey('user.login'), index=True)
     good = db.Column(db.Integer(), db.ForeignKey('good.id'), index=True)
-    in_collection = db.Column(db.Integer())
-    accepte_echange = db.Column(db.Integer())
-    souhaite = db.Column(db.Integer())
+    in_collection = db.Column(db.Integer(), default=0)
+    accepte_echange = db.Column(db.Integer(), default=0)
+    souhaite = db.Column(db.Integer(), default=1)
     date_mise_a_jour = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
 
     def __repr__(self):
