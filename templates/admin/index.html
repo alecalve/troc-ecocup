@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Interface administration{% endblock %}
+{% block body %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">Ajout d’écocup</div>
+      <div class="panel-body">
+        <form class="form" method="post" action="{{ url_for('admin.add') }}">
+          <div class="form-group">
+            <input type="text" class="form-control" name="name" placeholder="Nom">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" name="semestre" placeholder="Semestre">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" name="asso" placeholder="Association">
+          </div>
+          <div class="form-group">
+            <input type="number" class="form-control" name="exemplaires" placeholder="Nombre d’exemplaires">
+          </div>
+          <div class="form-group">
+            <input type="number" class="form-control" name="capacity" placeholder="Contenance (ml)">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" name="comment" placeholder="Commentaire (optionnel)">
+          </div>
+          <div class="form-group">
+            <input type="file" class="form-control" name="image_url" placeholder="Image">
+            <p class="help-block">Format png, taille 550*450</p>
+          </div>
+          <button class="btn btn-primary" action="submit">Valider</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">Édition d’écocup</div>
+          <div class="panel-body">
+            <form class="form form-inline" action="{{ url_for('admin.edit') }}" method="POST">
+              <div class="form-group">
+                <select name="ecocup">
+                {% for ecocup in ecocups %}
+                  <option value="{{ecocup.id}}">{{ecocup.nom}}</option>
+                {% endfor %}
+                </select>
+              </div>
+              <button class="btn btn-primary" action="submit">Éditer</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">Suppression d’écocup</div>
+          <div class="panel-body">
+            <form class="form form-inline" onsubmit="return confirm('Attention !!! Supprimer une écocup entraîne la suppression des échanges associés')">
+              <div class="form-group">
+                <select name="ecocup">
+                {% for ecocup in ecocups %}
+                  <option value="{{ecocup.id}}">{{ecocup.nom}}</option>
+                {% endfor %}
+                </select>
+              </div>
+              <button class="btn btn-primary" action="submit">Supprimer</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

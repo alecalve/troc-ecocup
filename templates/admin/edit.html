@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Édition Écocup{% endblock %}
+{% block body %}
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <div class="panel panel-default">
+      <div class="panel-heading">Modification d’écocup</div>
+      <div class="panel-body">
+        <form class="form">
+          <div class="form-group">
+            <input type="text" class="form-control" id="name" placeholder="Nom ({{ ecocup.nom }})">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="semestre" placeholder="Semestre ({{ ecocup.semestre }})">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="asso" placeholder="Association ({{ ecocup.asso }})">
+          </div>
+          <div class="form-group">
+            <input type="number" class="form-control" id="exemplaires" placeholder="Nombre d’exemplaires ({{ ecocup.nb_exemplaires }})">
+          </div>
+          <div class="form-group">
+            <input type="number" class="form-control" id="capacity" placeholder="Contenance (ml) ({{ ecocup.contenance }})">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" id="comment" placeholder="Commentaire (optionnel) ({{ ecocup.commentaires }})">
+          </div>
+          <div class="form-group">
+            <input type="file" class="form-control" id="image_url" placeholder="Image">
+            <p class="help-block">Format png, taille 550*450</p>
+          </div>
+          <button class="btn btn-primary" action="submit">Valider</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
