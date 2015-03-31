@@ -16,7 +16,7 @@ def mine():
     """ Affiche la collection de l’utilisateur connecté """
 
     username = session["username"]
-    collections = Collection.query.filter_by(login_user=session["username"])
+    collections = Collection.query.filter_by(login_user=session["username"]).all()
 
     return render_template("collection/index.html", **locals())
 
@@ -32,40 +32,15 @@ def update():
         modification = {}
         for modif in modifs:
             modification[modif["type"]] = modif["value"]
-        if modification["collection"] == 1:
+
+        if modification["possede"] == 1:
             modification["souhaite"] = 0
-        else:
-            modification["echange"] = 0
 
         collec = Collection().query.get(id)
-        collec.in_collection = modification["collection"]
+        collec.possede = modification["possede"]
         collec.souhaite = modification["souhaite"]
-        collec.accepte_echange = modification["echange"]
+        collec.ngoods = modification["ngoods"]
 
-        db.session.commit()
+    db.session.commit()
+
     return redirect(url_for("echange.compute"))
-
-
-@bp.route("compare/<string:usr>")
-@user_required
-def compare(usr):
-    username = session["username"]
-
-    if usr == username:
-        flash(u"Ça sert à rien de se comparer avec soi-même …", "info")
-        return redirect(url_for("collection.mine"))
-
-    user = User.query.get(usr)
-
-    if user is None:
-        flash(u"L’utilisateur saisi n’existe pas", "danger")
-        return redirect(url_for("collection.mine"))
-
-    collection_connected = Collection.query.filter_by(login_user=username).all()
-    collection_other = Collection.query.filter_by(login_user=usr).all()
-
-    collections = zip(collection_connected, collection_other)
-
-    collections = [(c, o) for c, o in collections if c.in_collection != o.in_collection]
-
-    return render_template("collection/compare.html", **locals())
