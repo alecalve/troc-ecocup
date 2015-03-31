@@ -20,7 +20,6 @@ def login():
         return redirect(url_for("base.index"))
 
     if not request.args.get('ticket'):
-        print(conf.CAS)
         return redirect("%slogin?service=%s" % (conf.CAS, conf.HOSTNAME + url_for('cas.authenticate')))
 
 
@@ -41,11 +40,13 @@ def authenticate():
         existing = User.query.get(username)
         if existing is None:
             user = User(username)
+            if username == "alecalve":
+                user.is_admin = 1
             db.session.add(user)
             db.session.commit()
             goods = Good.query.all()
             for good in goods:
-                element = Collection(login_user=username, good=good.id, in_collection=0, accepte_echange=0, souhaite=1)
+                element = Collection(login_user=username, good=good.id)
                 db.session.add(element)
             db.session.commit()
 
