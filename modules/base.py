@@ -20,6 +20,12 @@ def index():
     return render_template("base/index.html", **locals())
 
 
+@bp.route('comment-ca-marche')
+@user_required
+def comment_ca_marche():
+    return render_template('base/comment.html')
+
+
 @bp.route('like/<int:good>')
 @user_required
 def like(good, value=1):
