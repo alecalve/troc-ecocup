@@ -86,7 +86,6 @@
   $("a.up").click(function() {
     var id = $(this).data("id");
     $.getJSON("/like/" + id, function(data) {
-      console.log(data.appreciation);
       if (!data.error) {
         $("#"+id).text(data.appreciation);
       }
@@ -96,7 +95,6 @@
   $("a.down").click(function() {
     var id = $(this).data("id");
     $.getJSON("/dislike/" + id, function(data) {
-      console.log(data.appreciation);
       if (!data.error) {
         $("#"+id).text(data.appreciation);
       }
