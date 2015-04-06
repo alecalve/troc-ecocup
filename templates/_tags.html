@@ -6,4 +6,5 @@
   {% endif %}
 {% endmacro %}
 
+{% macro boolToInt(bool) %}{% if bool %}1{% else %}0{% endif %}{% endmacro %}
 {% macro make_name(string) %}{{string|replace("é", "e")|replace("'", "")|replace("ô", "o")|replace("?", "")|replace(" ", "")|lower}}{% endmacro %}
