@@ -10,5 +10,4 @@ bp = Blueprint('profil', __name__, url_prefix='/profil/')
 @bp.route('')
 @user_required
 def me():
-    username = session["username"]
     return render_template("profil/index.html", **locals())

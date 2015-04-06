@@ -12,7 +12,6 @@ bp = Blueprint('base', __name__, url_prefix='/')
 @bp.route('')
 @user_required
 def index():
-    username = session["username"]
     last_exchanges = Exchange.query.filter(
         Exchange.date_execution is not None).order_by(Exchange.date_execution).limit(10)
     last_exchanges = list(last_exchanges)
@@ -29,7 +28,6 @@ def comment_ca_marche():
 @bp.route('like/<int:good>')
 @user_required
 def like(good, value=1):
-    username = session["username"]
     like = Like.query.filter_by(user=username, good=good).first()
 
     if like is None:
