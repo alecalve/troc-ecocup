@@ -19,16 +19,6 @@ def exchanges():
     return render_template("echange/index.html", **locals())
 
 
-@bp.route('<int:exchange_id>')
-@user_required
-def get(exchange_id):
-    metadata = ExchangeMetadata.query.get(exchange_id)
-    if metadata is None:
-        abort(404)
-
-    return render_template("echange/echange.html", **locals())
-
-
 def do_exchange(giver_id, receiver_id, giver_goods, receiver_goods):
     """
     Do all what is needed for an exchange to be done:
