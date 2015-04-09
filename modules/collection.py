@@ -15,8 +15,7 @@ bp = Blueprint('collection', __name__, url_prefix='/collection/')
 def mine():
     """ Affiche la collection de l’utilisateur connecté """
 
-    username = session["username"]
-    collections = Collection.query.filter_by(login_user=session["username"]).all()
+    collections = User.query.get(session["username"]).collections
 
     return render_template("collection/index.html", **locals())
 
@@ -29,18 +28,17 @@ def update():
     text = request.form["json"]
     data = json.loads(text)
     for id, modifs in data.items():
-        modification = {}
-        for modif in modifs:
-            modification[modif["type"]] = modif["value"]
+        if modifs["wishesit"] == 1:
+            modifs["hasit"] = 0
 
-        if modification["possede"] == 1:
-            modification["souhaite"] = 0
+        if modifs["hasit"] == 1:
+            modifs["wishesit"] = 0
 
-        collec = Collection().query.get(id)
-        collec.possede = modification["possede"]
-        collec.souhaite = modification["souhaite"]
-        collec.ngoods = modification["ngoods"]
+        collec = Collection.query.get(id)
+        collec.has_it = modifs["hasit"]
+        collec.wishes_it = modifs["wishesit"]
+        collec.value = modifs["value"]
 
-    db.session.commit()
+        db.session.commit()
 
-    return redirect(url_for("echange.compute"))
+    return redirect(url_for("exchange.compute"))
