@@ -70,6 +70,6 @@ def delete():
 
     ecocup = Good.query.get(request.form["ecocup"])
     db.session.delete(ecocup)
-    db.commit()
+    db.session.commit()
 
     return render_template("admin/index.html", **locals())
