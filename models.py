@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from database import db
 import datetime
 
@@ -9,35 +6,60 @@ class User(db.Model):
     login = db.Column(db.String(8), primary_key=True)
     email = db.Column(db.String(100))
     is_admin = db.Column(db.Boolean(), default=False)
-    date_join = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
-    last_login = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
+    date_join = db.Column(db.DateTime())
+    last_login = db.Column(db.DateTime())
 
     collections = db.relationship('Collection', backref='user', lazy='dynamic')
 
     def __init__(self, login):
         self.login = login
         self.email = "%s@etu.utc.fr" % login
+        self.date_join = datetime.datetime.utcnow()
+        self.last_login = datetime.datetime.utcnow()
 
     def __repr__(self):
         return '<User %r>' % self.login
 
 
-class Exchange(db.Model):
+class ExchangeMetadata(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    user1 = db.Column(db.String(8), db.ForeignKey('user.login'))
-    user2 = db.Column(db.String(8), db.ForeignKey('user.login'))
-    # User1 donne good1
-    good1 = db.Column(db.Integer(), db.ForeignKey('good.id'))
-    good2 = db.Column(db.Integer(), db.ForeignKey('good.id'))
+    giver_id = db.Column(db.String(8), db.ForeignKey('user.login'))
+    receiver_id = db.Column(db.String(8), db.ForeignKey('user.login'))
     date_execution = db.Column(db.DateTime(), default=None)
-    date_conf1 = db.Column(db.DateTime(), default=None)
-    date_conf2 = db.Column(db.DateTime(), default=None)
+    date_conf_giver = db.Column(db.DateTime(), default=None)
+    date_conf_receiver = db.Column(db.DateTime(), default=None)
     date_cancelled = db.Column(db.DateTime(), default=None)
     canceller = db.Column(db.String(8), default=None)
-    date_creation = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
+    date_creation = db.Column(db.DateTime())
+
+    data = db.relationship("ExchangeData", backref="exchange")
+    giver = db.relationship("User", foreign_keys="ExchangeMetadata.giver_id")
+    receiver = db.relationship("User", foreign_keys="ExchangeMetadata.receiver_id")
+
+    def __init__(self, giver, receiver):
+        self.giver_id = giver
+        self.receiver_id = receiver
+        self.date_creation = datetime.datetime.utcnow()
 
     def __repr__(self):
-        return '<Echange %r>' % self.id
+        return '<EchangeMetadata %r>' % self.id
+
+
+class ExchangeData(db.Model): 
+    id = db.Column(db.Integer(), primary_key=True)
+    exchange_id = db.Column(db.Integer(), db.ForeignKey('exchange_metadata.id'))
+    good_id = db.Column(db.Integer(), db.ForeignKey('good.id'))
+    giver = db.Column(db.String(8), db.ForeignKey('user.login'))
+
+    good = db.relationship("Good")
+
+    def __init__(self, exchange, good, giver):
+        self.exchange_id = exchange
+        self.good_id = good
+        self.giver = giver
+
+    def __repr__(self):
+        return '<EchangeData %r>' % self.id
 
 
 class Good(db.Model):
@@ -51,23 +73,39 @@ class Good(db.Model):
     commentaires = db.Column(db.String(140))
 
     collections = db.relationship('Collection', backref='good_ref', lazy='dynamic')
-    exchanges_1 = db.relationship('Exchange', backref='good1_ref', foreign_keys=[Exchange.good1], lazy='dynamic')
-    exchanges_2 = db.relationship('Exchange', backref='good2_ref', foreign_keys=[Exchange.good2], lazy='dynamic')
 
     def __repr__(self):
         return '<Good %r>' % self.id
 
 
 class Collection(db.Model):
+    """
+    Collection represents what the users have.
+    In order for announces to be valid, the announcer MUST have the goods
+    he wishes to exchange, if a user loses a good, any announce tied to it
+    becomes invalid
+    """
+
     id = db.Column(db.Integer(), primary_key=True)
     login_user = db.Column(db.String(8), db.ForeignKey('user.login'), index=True)
-    good = db.Column(db.Integer(), db.ForeignKey('good.id'), index=True)
-    # Using Integer instead of Boolean because of serialization conflict between True (python) and true (js)
-    possede = db.Column(db.Integer(), default=0)
-    # Using Integer instead of Boolean because of serialization conflict between True (python) and true (js)
-    souhaite = db.Column(db.Integer(), default=0)
-    ngoods = db.Column(db.Integer(), default=1)
-    date_mise_a_jour = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
+    good_id = db.Column(db.Integer(), db.ForeignKey('good.id'), index=True)
+    # value represents how many distinct other goods the user wants in exchange of this one
+    # or how many distinct good he is ready to give away to get it 
+    value = db.Column(db.Integer(), default=1)
+    has_it = db.Column(db.Boolean(), default=False)
+    wishes_it = db.Column(db.Boolean(), default=False)
+    # A good is locked when an exchange is pending
+    locked = db.Column(db.Boolean(), default=False)
+    created_at = db.Column(db.DateTime())
+    last_updated = db.Column(db.DateTime())
+    date_given = db.Column(db.DateTime(), default=None)
+
+    good = db.relationship("Good")
+
+    def __init__(self, login_user, good):
+        self.login_user = login_user
+        self.good_id = good
+        self.created_at = datetime.datetime.utcnow()
 
     def __repr__(self):
         return '<Collection %r>' % self.id
