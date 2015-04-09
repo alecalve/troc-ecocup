@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_tags.html" import boolean %}
+{% from "_tags.html" import boolean, boolToInt %}
 {% block title %}Ma collection{% endblock %}
 {% block body %}
 <div class="row">
@@ -8,25 +8,27 @@
       <thead>
         <tr>
           <th>Écocup</th>
-          <th class="header" data-origin="0" data-type="collection">Dans la collection</th>
-          <th class="header" data-origin="0" data-type="echange">Proposée à l’échange</th>
-          <th class="header" data-origin="0" data-type="souhaite">Souhaite l’avoir</th>
+          <th class="header" data-origin="0" data-type="collection">Je veux la cèder</th>
+          <th class="header" data-origin="0" data-type="collection">Je veux l’avoir</th>
+          <th class="header" data-origin="0" data-type="souhaite">Valeur de l’écocup</th>
         </tr>
       </thead>
       <tbody>
         {% for collec in collections %}
-        {% if collec.in_collection %}
-        <tr id="{{ collec.id }}" class="success">
+        {% if collec.locked %}
+        <tr class="warning">
+        {% elif collec.has_it %}
+        <tr data-id="{{ collec.id }}" data-hasit={{ boolToInt(collec.has_it) }} data-wishesit={{ boolToInt(collec.wishes_it) }} data-ngoods={{ collec.value }} class="datarow success">
         {% else %}
-        <tr id="{{ collec.id }}" class="danger">
+        <tr data-id="{{ collec.id }}" data-hasit={{ boolToInt(collec.has_it) }} data-wishesit={{ boolToInt(collec.wishes_it) }} data-ngoods={{ collec.value }} class="datarow danger">
         {% endif %}
           <td>{{ collec.good_ref.nom }}</td>
-          <td class="data" data-type="collection" data-value="{{ collec.in_collection }}" data-id="{{ collec.id }}">{{ boolean(collec.in_collection) }}</td>
-          <td class="data" data-type="echange" data-value="{{ collec.accepte_echange }}" data-id="{{ collec.id }}">{{ boolean(collec.accepte_echange) }}</td>
-          {% if collec.in_collection %}
-          <td class="data" data-type="souhaite" data-value="{{ collec.souhaite }}" data-id="{{ collec.id }}"><span class="glyphicon glyphicon-minus"></span></td>
+          <td class="data hasit">{{ boolean(collec.has_it) }}</td>
+          <td class="data wishesit">{{ boolean(collec.wishes_it) }}</td>
+          {% if collec.locked %}
+          <td class="data ngoods"><input class="disabled" type="number" value="{{ collec.value }}"></td>
           {% else %}
-          <td class="data" data-type="souhaite" data-value="{{ collec.souhaite }}" data-id="{{ collec.id }}">{{ boolean(collec.souhaite) }}</td>
+          <td class="data ngoods"><input type="number" value="{{ collec.value }}"></td>
           {% endif %}
         </tr>
         {% endfor %}
@@ -53,21 +55,24 @@
 {% block extrajs %}
 <script>
 
-	$("document").ready(function () {
+  $("document").ready(function () {
     $("#modifications").hide();
     $("#form").hide();
     if (!!$('#sticky').offset()) { // make sure ".sticky" element exists
 
       var stickyTop = $('#sticky').offset().top; // returns number
-      var originalWidth = $('#sticky').width();
+      var originalWidth = $('#sticky').outerWidth();
 
       $(window).scroll(function(){ // scroll event
 
         var windowTop = $(window).scrollTop(); // returns number
         if (stickyTop < windowTop){
-          $('#sticky').css({ position: 'fixed', top: 5,
-                             left: $("#left").width() + ($("body").width() - $(".container").width())/2,
-                             width: originalWidth});
+          $('#sticky').css({
+            position: 'fixed', 
+            top: 5,
+            left: $("#left").outerWidth() + ($("body").innerWidth() - $(".container").innerWidth())/2,
+            width: originalWidth
+          });
         } else {
           $('#sticky').css('position','static');
         }
@@ -75,89 +80,66 @@
     }
   });
 
-	var refresh = function() {
-    $(".data").each(function () {
-      $(this).empty();
-      var value = $(this).data("value")
-			if (value == 1) {
-				$(this).html('<span class="glyphicon glyphicon-ok up"></span>');
-      } else {
-        $(this).html('<span class="glyphicon glyphicon-remove down"></span>');
-      }
+  var getBinaryClass = function(bool) {
+    return bool ? "success" : "danger";
+  };
 
-      if ($(this).data("type") == "collection") {
-        if ($(this).parent().hasClass("modified")) {
-          $(this).parent().removeClass();
-          if (value) {
-            $(this).parent().addClass("success");
-          } else {
-            $(this).parent().addClass("danger");
-          }
-          $(this).parent().addClass("modified");
-        } else {
-          $(this).parent().removeClass();
-          if (value) {
-            $(this).parent().addClass("success");
-          } else {
-            $(this).parent().addClass("danger");
-          }
-        }
-    }
+  var getBinaryIconClass = function(bool) {
+    return bool ? "ok up" : "remove down";
+  };
 
-      if (($(this).data("type") == "souhaite") && $(this).parent().hasClass("success")) {
-        $(this).html('<span class="glyphicon glyphicon-minus"></span>');
-      }
-
-    });
+  var toInt = function(bool) {
+    return bool ? 1 : 0;
   }
 
-  $(".data").click(function () {
+  var refresh = function() {
+    $(".modified").each(function () {
+      var hasit = $(this).data("hasit");
+      var wishesit = $(this).data("wishesit");
+      
+      $(this).find(".hasit").html("<span class='glyphicon glyphicon-" + getBinaryIconClass(hasit) + "'></span>");
+      $(this).find(".wishesit").html("<span class='glyphicon glyphicon-" + getBinaryIconClass(wishesit) + "'></span>");
+      
+      $(this).removeClass(getBinaryClass(!hasit));
+      $(this).addClass(getBinaryClass(hasit));
+    });
+  };
+
+  $(".hasit").click(function () {
     $("#modifications").show();
-    var type = $(this).data("type");
-    var value = $(this).data("value");
+    $(this).parent().data("hasit", toInt(!$(this).parent().data("hasit")));
 
-
-    if (type == "collection") {
-      if (value) {
-        $(this).data("value", 0);
-      } else {
-        $(this).data("value", 1);
-      }
-      $(this).parent().addClass("modified");
+    if ($(this).parent().data("wishesit")) {
+        $(this).parent().data("wishesit", toInt(!$(this).parent().data("wishesit")));
     }
-
-    if (type == "echange") {
-      $(this).parent().removeClass();
-      if (value) {
-        $(this)
-        $(this).data("value", 0);
-        $(this).prev().data("value", 0);
-        $(this).next().data("value", 1);
-      } else {
-        $(this).data("value", 1);
-        $(this).prev().data("value", 1);
-        $(this).next().data("value", 0);
-      }
-
-      $(this).parent().addClass("modified");
-    }
-
-    if (type == "souhaite" && $(this).parent().hasClass("danger")) {
-      if (value) {
-        $(this).data("value", 0);
-      } else {
-        $(this).data("value", 1);
-      }
-      $(this).parent().addClass("modified");
-    }
-
+    $(this).parent().addClass("modified");
     refresh();
   });
 
-  $("tbody tr").hover(function() {
-    console.log($(this).children().first().text());
-    $("#ecoName").text($(this).children().first().text());
+  $(".wishesit").click(function () {
+    $("#modifications").show();
+    $(this).parent().data("wishesit", toInt(!$(this).parent().data("wishesit")));
 
+
+    if ($(this).parent().data("hasit")) {
+        $(this).parent().data("hasit", toInt(!$(this).parent().data("hasit")));
+    }
+    
+    $(this).parent().addClass("modified");
+    refresh();
+  });
+
+  $("input[type=number]").on("change paste keyup", function() {
+    var val = $(this).val();
+    $("#modifications").show();
+    $(this).parent().parent().addClass("modified");
+    if (val !== "") {
+        $(this).parent().parent().data("ngoods", val);
+    }
+  });
+ 
+  $("tbody tr").hover(function() {
+    $("#ecoName").text($(this).children().first().text());
   }, function() {});
 
   $("#submit").click(function() {
@@ -165,45 +147,21 @@
     var modifications = {};
 
     $(".modified").each(function () {
-			var parentId = $(this).attr("id");
-      modifications[parentId] = [];
-      $(this).children('.data').each(function() {
-        var type = $(this).data("type");
-        var value = $(this).data("value");
-        var id = $(this).data("id");
-        var modif = new Object();
-        modif.type = type;
-        modif.value = value;
-        modifications[parentId].push(modif);
-      });
-
+      var id = $(this).data("id");
+      var hasit = $(this).data("hasit");
+      var wishesit = $(this).data("wishesit");
+      var ngoods = $(this).data("ngoods");
+      var id = $(this).data("id");
+      var modif = new Object();
+      modif.hasit = hasit;
+      modif.wishesit = wishesit;
+      modif.value = ngoods;
+      modifications[id] = modif;
     });
 
     $("#json").val(JSON.stringify(modifications));
     $("#form").submit();
 
-  });
-
-  $(".header").dblclick(function() {
-    var type=$(this).data("type");
-    var origin=$(this).data("origin");
-    if (type == "echange") {
-      $("td[data-type=echange]").each(function() { if (origin) { $(this).data("value", 0); } else { $(this).data("value", 1); }});
-      $("td[data-type=collection]").each(function() { if (origin) { $(this).data("value", 0); } else { $(this).data("value", 1); }});
-      $("td[data-type=souhaite]").each(function() { if (origin) { $(this).data("value", 1); } else { $(this).data("value", 0); }});
-      $(this).data("origin", !origin);
-    }
-    if (type == "collection") {
-      $("td[data-type=collection]").each(function() { if (origin) { $(this).data("value", 0); } else { $(this).data("value", 1); }});
-      $("td[data-type=souhaite]").each(function() { if (origin) { $(this).data("value", 1); } else { $(this).data("value", 0); }});
-      $("td[data-type=echange]").each(function() { if (origin) { $(this).data("value", 0); }});
-      $(this).data("origin", !origin);
-    }
-    if (type == "souhaite") {
-      $("td[data-type=souhaite]").each(function() { if (origin) { $(this).data("value", 1); } else { $(this).data("value", 0); }});
-      $(this).data("origin", !origin);
-    }
-    refresh();
   });
 </script>
 {% endblock %}
