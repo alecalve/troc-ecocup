@@ -46,7 +46,7 @@ def authenticate():
             db.session.commit()
             goods = Good.query.all()
             for good in goods:
-                element = Collection(login_user=username, good=good.id)
+                element = Collection(username, good.id)
                 db.session.add(element)
             db.session.commit()
 

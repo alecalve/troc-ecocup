@@ -1,10 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from flask import render_template, session, Blueprint, jsonify
 from helpers import user_required
 from database import db
-from models import Good, Exchange, Like
+from models import Good, ExchangeMetadata, Like
 
 bp = Blueprint('base', __name__, url_prefix='/')
 
@@ -12,8 +9,8 @@ bp = Blueprint('base', __name__, url_prefix='/')
 @bp.route('')
 @user_required
 def index():
-    last_exchanges = Exchange.query.filter(
-        Exchange.date_execution is not None).order_by(Exchange.date_execution).limit(10)
+    last_exchanges = ExchangeMetadata.query.filter(
+        ExchangeMetadata.date_execution != None).order_by(ExchangeMetadata.date_execution).limit(10)
     last_exchanges = list(last_exchanges)
     goods = list(enumerate(Good.query.all()))
     return render_template("base/index.html", **locals())
@@ -40,8 +37,7 @@ def like(good, value=1):
     if good is None:
         return jsonify({"error": True})
     db.session.commit()
-    good.appreciation = sum(
-        map(lambda l: l.valeur, Like.query.filter_by(good=good.id).all()))
+    good.appreciation = sum(map(lambda l: l.valeur, Like.query.filter_by(good=good.id).all()))
     db.session.commit()
     return jsonify({"appreciation": good.appreciation, "error": False})
 
