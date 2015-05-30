@@ -37,6 +37,10 @@ def add():
             return redirect(url_for("collection.mine"))
         else:
             collec = Collection(session["username"], ecocup.id)
+            if int(request.form["value"]) < 1:
+                flash("La valeur doit être d’au moins 1", "warning")
+                return redirect(url_for("collection.mine"))
+
             collec.value = request.form["value"]
             if request.form["type"] == "has":
                 collec.has_it = True
