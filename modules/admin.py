@@ -1,8 +1,9 @@
-from flask import render_template, session, Blueprint, abort, request, flash
-from models import User, Good, Collection
+from flask import render_template, session, Blueprint, abort, request, flash, redirect, url_for
+from models import User, Good
 from helpers import user_required
 from database import db
-
+import os
+import conf
 
 bp = Blueprint('admin', __name__, url_prefix='/admin/')
 
@@ -31,35 +32,59 @@ def add():
 
     good = Good()
     good.nom = request.form["name"]
-    good.asso= request.form["asso"]
+    good.asso = request.form["asso"]
     good.semestre = request.form["semestre"]
     good.nb_exemplaires = request.form["exemplaires"]
     good.contenance = request.form["capacity"]
     good.commentaires = request.form["comment"]
 
     db.session.add(good)
-
-    users = User.query.all()
-    for user in users:
-       element = Collection(login_user=user.login, good=good.id)
-       db.session.add(element)
-
     db.session.commit()
+    db.session.flush()
+    db.session.refresh(good)
+
+    file = request.files['file']
+    if file:
+        extension = file.filename.split(".")[-1]
+        file.save(os.path.join(conf.UPLOAD_FOLDER, str(good.id) + "." + extension))
+        good.image_url = str(good.id) + "." + extension
+        db.session.add(good)
+        db.session.commit()
 
     flash("Écocup %s ajoutée" % good.nom, "success")
 
     return render_template("admin/index.html", **locals())
 
 
-@bp.route('ecocup/edit', methods=["POST"])
+@bp.route('ecocup/edit', methods=["POST", "GET"])
 @user_required
 def edit():
     if not is_admin_connected():
         abort(401)
 
-    ecocup = Good.query.get(request.form["ecocup"])
+    if request.method == "GET":
+        ecocup = Good.query.get(request.values["ecocup"])
+        return render_template("admin/edit.html", **locals())
+    else:
+        ecocup = Good.query.get(request.form["ecocup"])
+        for key in ["nom", "asso", "semestre", "nb_exemplaires", "contenance", "commentaires"]:
+            if request.form[key] != "":
+                setattr(ecocup, key, request.form[key])
 
-    return render_template("admin/edit.html", **locals())
+        file = request.files['file']
+        if file:
+            extension = file.filename.split(".")[-1]
+            file.save(os.path.join(conf.UPLOAD_FOLDER, str(ecocup.id) + "." + extension))
+            ecocup.image_url = str(ecocup.id) + "." + extension
+            db.session.add(ecocup)
+            db.session.commit()
+
+        db.session.commit()
+
+    flash("Écocup %s modifiée" % ecocup.nom, "success")
+
+    return render_template("admin/index.html", **locals())
+
 
 
 @bp.route('ecocup/delete', methods=["POST"])
@@ -72,4 +97,4 @@ def delete():
     db.session.delete(ecocup)
     db.session.commit()
 
-    return render_template("admin/index.html", **locals())
+    return redirect(url_for("admin.index"))

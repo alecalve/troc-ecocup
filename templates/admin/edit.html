@@ -6,27 +6,28 @@
     <div class="panel panel-default">
       <div class="panel-heading">Modification d’écocup</div>
       <div class="panel-body">
-        <form class="form">
+        <form class="form" method="post" enctype="multipart/form-data" action="{{ url_for("admin.edit") }}">
+            <input type="text" style="display: none" name="ecocup" value="{{ ecocup.id }}">
           <div class="form-group">
-            <input type="text" class="form-control" id="name" placeholder="Nom ({{ ecocup.nom }})">
+            <input type="text" class="form-control" name="nom" placeholder="Nom ({{ ecocup.nom }})">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" id="semestre" placeholder="Semestre ({{ ecocup.semestre }})">
+            <input type="text" class="form-control" name="semestre" placeholder="Semestre ({{ ecocup.semestre }})">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" id="asso" placeholder="Association ({{ ecocup.asso }})">
+            <input type="text" class="form-control" name="asso" placeholder="Association ({{ ecocup.asso }})">
           </div>
           <div class="form-group">
-            <input type="number" class="form-control" id="exemplaires" placeholder="Nombre d’exemplaires ({{ ecocup.nb_exemplaires }})">
+            <input type="number" class="form-control" name="nb_exemplaires" placeholder="Nombre d’exemplaires ({{ ecocup.nb_exemplaires }})">
           </div>
           <div class="form-group">
-            <input type="number" class="form-control" id="capacity" placeholder="Contenance (ml) ({{ ecocup.contenance }})">
+            <input type="number" class="form-control" name="contenance" placeholder="Contenance (ml) ({{ ecocup.contenance }})">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" id="comment" placeholder="Commentaire (optionnel) ({{ ecocup.commentaires }})">
+            <input type="text" class="form-control" name="commentaires" placeholder="Commentaire (optionnel) ({{ ecocup.commentaires }})">
           </div>
           <div class="form-group">
-            <input type="file" class="form-control" id="image_url" placeholder="Image">
+            <input type="file" class="form-control" name="file" placeholder="Image">
             <p class="help-block">Format png, taille 550*450</p>
           </div>
           <button class="btn btn-primary" action="submit">Valider</button>

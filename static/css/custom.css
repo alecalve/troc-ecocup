@@ -9,6 +9,16 @@
 
 .carousel .item > img { display: inline-block; }
 
+.tab-content {
+    margin-top: 10px;
+}
+
+.bg-soft {
+    background-color: rgba(255, 255, 255, 0.7);
+    width: 50%;
+    display: inline-block;
+    border-radius: 5px;
+}
 
 .navbar input {
 	margin-top: 5px;

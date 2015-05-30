@@ -1,6 +1,5 @@
-from flask import session, Blueprint, render_template
-from models import Good, Collection
-from database import db
+from flask import Blueprint, render_template, abort
+from models import Good
 from helpers import user_required
 
 

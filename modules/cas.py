@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from flask import url_for, redirect, request, session, flash, Blueprint
 import conf
 import requests
@@ -29,7 +26,8 @@ def authenticate():
         return redirect(url_for("base.index"))
 
     ticket = request.args.get("ticket")
-    r = requests.get("%sserviceValidate?ticket=%s&service=%s" % (conf.CAS, ticket, conf.HOSTNAME + url_for('cas.authenticate')))
+    r = requests.get(
+        "%sserviceValidate?ticket=%s&service=%s" % (conf.CAS, ticket, conf.HOSTNAME + url_for('cas.authenticate')))
 
     if "authenticationFailure" in r.text:
         return redirect(url_for("base.index"))
@@ -44,15 +42,9 @@ def authenticate():
                 user.is_admin = 1
             db.session.add(user)
             db.session.commit()
-            goods = Good.query.all()
-            for good in goods:
-                element = Collection(username, good.id)
-                db.session.add(element)
-            db.session.commit()
-
             return redirect(url_for("collection.mine"))
         else:
-            existing.last_login = datetime.datetime.utcnow()
+            existing.last_login = datetime.datetime.now()
 
         db.session.commit()
         session["logged_in"] = True

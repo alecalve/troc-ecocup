@@ -14,8 +14,8 @@ class User(db.Model):
     def __init__(self, login):
         self.login = login
         self.email = "%s@etu.utc.fr" % login
-        self.date_join = datetime.datetime.utcnow()
-        self.last_login = datetime.datetime.utcnow()
+        self.date_join = datetime.datetime.now()
+        self.last_login = datetime.datetime.now()
 
     def __repr__(self):
         return '<User %r>' % self.login
@@ -39,13 +39,13 @@ class ExchangeMetadata(db.Model):
     def __init__(self, giver, receiver):
         self.giver_id = giver
         self.receiver_id = receiver
-        self.date_creation = datetime.datetime.utcnow()
+        self.date_creation = datetime.datetime.now()
 
     def __repr__(self):
         return '<EchangeMetadata %r>' % self.id
 
 
-class ExchangeData(db.Model): 
+class ExchangeData(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     exchange_id = db.Column(db.Integer(), db.ForeignKey('exchange_metadata.id'))
     good_id = db.Column(db.Integer(), db.ForeignKey('good.id'))
@@ -71,6 +71,7 @@ class Good(db.Model):
     contenance = db.Column(db.Integer())
     appreciation = db.Column(db.Integer(), default=0)
     commentaires = db.Column(db.String(140))
+    image_url = db.Column(db.String(100), server_default="default.gif")
 
     collections = db.relationship('Collection', backref='good_ref', lazy='dynamic')
 
@@ -90,14 +91,13 @@ class Collection(db.Model):
     login_user = db.Column(db.String(8), db.ForeignKey('user.login'), index=True)
     good_id = db.Column(db.Integer(), db.ForeignKey('good.id'), index=True)
     # value represents how many distinct other goods the user wants in exchange of this one
-    # or how many distinct good he is ready to give away to get it 
+    # or how many distinct good he is ready to give away to get it
     value = db.Column(db.Integer(), default=1)
     has_it = db.Column(db.Boolean(), default=False)
     wishes_it = db.Column(db.Boolean(), default=False)
     # A good is locked when an exchange is pending
     locked = db.Column(db.Boolean(), default=False)
-    created_at = db.Column(db.DateTime())
-    last_updated = db.Column(db.DateTime())
+    created_at = db.Column(db.DateTime(), default=datetime.datetime.now())
     date_given = db.Column(db.DateTime(), default=None)
 
     good = db.relationship("Good")
@@ -105,7 +105,6 @@ class Collection(db.Model):
     def __init__(self, login_user, good):
         self.login_user = login_user
         self.good_id = good
-        self.created_at = datetime.datetime.utcnow()
 
     def __repr__(self):
         return '<Collection %r>' % self.id
