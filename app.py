@@ -16,6 +16,9 @@ def create_app(create_db=False):
     register_blueprints(app, "modules", ["modules"])
 
     app.config["SQLALCHEMY_DATABASE_URI"] = conf.DB
+    # Maximum 3Mo pour les images
+    app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024
+
     db.init_app(app)
     db.app = app
 
