@@ -32,7 +32,7 @@ def tel():
     user.tel = request.form["tel"]
     db.session.commit()
 
-    flash("Ton téléphone a été changé", "success    ")
+    flash("Ton téléphone a été changé", "success")
     return render_template("profil/index.html", **locals())
 
 
