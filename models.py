@@ -4,10 +4,12 @@ import datetime
 
 class User(db.Model):
     login = db.Column(db.String(8), primary_key=True)
-    email = db.Column(db.String(100))
+    email = db.Column(db.String(100), default="")
+    tel = db.Column(db.String(100), default="")
     is_admin = db.Column(db.Boolean(), default=False)
     date_join = db.Column(db.DateTime())
     last_login = db.Column(db.DateTime())
+    active = db.Column(db.Boolean(), default=True)
 
     collections = db.relationship('Collection', backref='user', lazy='dynamic')
 
