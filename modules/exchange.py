@@ -45,9 +45,7 @@ def confirm(exchange_id):
         for data in echange.data:
             for user in [echange.giver_id, echange.receiver_id]:
                 collec = Collection.query.filter_by(login_user=user, good_id=data.good_id).first()
-                collec.locked = False
-                collec.has_it = False
-                collec.wishes_it = False
+                db.session.delete(collec)
 
         db.session.commit()
     else:
