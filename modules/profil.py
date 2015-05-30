@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-from flask import render_template, session, Blueprint
+from flask import render_template, Blueprint
 from helpers import user_required
 
 bp = Blueprint('profil', __name__, url_prefix='/profil/')
