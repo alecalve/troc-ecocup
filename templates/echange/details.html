@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Détails{% endblock %}
+{% block body %}
+<div class="row">
+  <div class="col-md-12">
+    {% for col in has %}
+    <div class="col-md-4">
+      <div class="panel panel-default bootcards-media">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            {{ col.good.nom }}
+            {% if col.locked %}
+              <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+            {% endif %}
+              <small> (valeur {{ col.value }})</small>
+          </h3>
+        </div>
+        <div class="panel-body">
+          <img src="{{ url_for("base.image", filename=col.good.image_url) }}" class="img-responsive img-rounded center-block"/>
+        </div>
+        <div class="panel-footer">
+          <div class="btn-group btn-group-justified">
+            <div class="btn-group">
+              <a class="btn btn-default" href="{{ url_for("good.summary", good_id=col.good_id) }}">
+                Statistiques
+              </a>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary {% if col.locked %}disabled{% endif %}" data-toggle="modal" data-target="#modalDelete" data-id={{ col.good.id }}>
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

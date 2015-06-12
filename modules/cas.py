@@ -2,7 +2,7 @@ from flask import url_for, redirect, request, session, flash, Blueprint
 import conf
 import requests
 from xml.dom.minidom import parseString
-from models import User, Good, Collection
+from models import User
 import datetime
 from database import db
 

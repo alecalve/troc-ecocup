@@ -1,15 +1,15 @@
-from flask import render_template, url_for, redirect, session, flash, Blueprint
+from flask import render_template, url_for, redirect, session, flash, Blueprint, request
 from helpers import user_required
-from models import ExchangeMetadata, ExchangeData, Collection
+from models import ExchangeMetadata, ExchangeData
 from database import db
 import datetime
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 
 
 bp = Blueprint('exchange', __name__, url_prefix='/exchange/')
 
 
-@bp.route('')
+@bp.route('done')
 @user_required
 def exchanges():
     username = session["username"]
@@ -17,7 +17,54 @@ def exchanges():
     user_exchanges = ExchangeMetadata.query.filter(
         or_(ExchangeMetadata.giver_id == username, ExchangeMetadata.receiver_id == username)).all()
 
+    return render_template("echange/done.html", **locals())
+
+
+@bp.route('')
+@user_required
+def index():
+    username = session["username"]
+
+    user_exchanges = ExchangeMetadata.query.filter(
+        and_(ExchangeMetadata.giver_id == username, ExchangeMetadata.receiver_id == None)).all()
+
     return render_template("echange/index.html", **locals())
+
+
+@bp.route('create', methods=["POST"])
+@user_required
+def create():
+
+    metadata = ExchangeMetadata(session["username"])
+    db.session.add(metadata)
+
+    # Forced to flush & refresh to get the metadata.id
+    db.session.flush()
+    db.session.refresh(metadata)
+
+    for good_id in request.form["giver_goods"]:
+        data = ExchangeData(metadata.id, good_id, session["username"])
+        db.session.add(data)
+
+    for good_id in request.form["receiver_goods"]:
+        data = ExchangeData(metadata.id, good_id, None)
+        db.session.add(data)
+
+    db.session.commit()
+
+    return redirect("exchange.index")
+
+
+@bp.route('delete')
+@user_required
+def delete():
+    return render_template("echange/index.html", **locals())
+
+
+@bp.route('details')
+@user_required
+def details():
+    return render_template("echange/details.html", **locals())
 
 
 @bp.route('confirm/<exchange_id>')
@@ -37,20 +84,14 @@ def confirm(exchange_id):
     else:
         echange.date_conf_receiver = datetime.datetime.now()
 
-    db.session.commit()
-
     if echange.date_conf_receiver is not None and echange.date_conf_giver is not None:
         flash("Échange confirmé !", "success")
         echange.date_execution = datetime.datetime.now()
-        for data in echange.data:
-            for user in [echange.giver_id, echange.receiver_id]:
-                collec = Collection.query.filter_by(login_user=user, good_id=data.good_id).first()
-                db.session.delete(collec)
-
-        db.session.commit()
     else:
         other = echange.giver_id if session["username"] == echange.receiver_id else echange.receiver_id
         flash("L’échange sera confirmé lorsque %s aura aussi confirmé" % other, "info")
+
+    db.session.commit()
 
     return redirect(url_for("exchange.exchanges"))
 
@@ -71,53 +112,11 @@ def cancel(exchange_id):
     echange.date_cancelled = datetime.datetime.now()
     echange.canceller = session["username"]
 
-    for data in echange.data:
-        for user in [echange.giver_id, echange.receiver_id]:
-            # Reset des possessions pour éviter un nouveau matching immédiat
-            collec = Collection.query.filter_by(login_user=user, good_id=data.good_id).first()
-            db.session.delete(collec)
     db.session.commit()
     flash("Échange annulé", "danger")
     compute(session["username"])
 
     return redirect(url_for("exchange.exchanges"))
-
-
-def do_exchange(giver_id, receiver_id, giver_goods, receiver_goods):
-    """
-    Do all what is needed for an exchange to be done:
-        · locks the goods
-        · creates the ExchangeMetadata
-        · creates the ExchangeData
-        · notifies the users
-    """
-
-    # Locking the goods
-    for good_id in giver_goods + receiver_goods:
-        collec = Collection.query.filter_by(login_user=giver_id, good_id=good_id).first()
-        collec.locked = True
-
-    for good_id in giver_goods + receiver_goods:
-        collec = Collection.query.filter_by(login_user=receiver_id, good_id=good_id).first()
-        collec.locked = True
-
-    metadata = ExchangeMetadata(giver_id, receiver_id)
-    db.session.add(metadata)
-
-    # Forced to flush & refresh to get the metadata.id
-    db.session.flush()
-    db.session.refresh(metadata)
-
-    for good_id in giver_goods:
-        data = ExchangeData(metadata.id, good_id, giver_id)
-        db.session.add(data)
-
-    for good_id in receiver_goods:
-        data = ExchangeData(metadata.id, good_id, receiver_id)
-        db.session.add(data)
-
-    # TODO notify users
-    db.session.commit()
 
 
 def compute(user):
@@ -144,11 +143,6 @@ ORDER BY c1.value DESC;"""
     user_concerned = False
     for match in db_matches:
         giver, receiver, good_id, value, collec_id = match
-
-        # Check if exchanged good is not locked in a previous exchange done in this loop
-        g = Collection.query.get(collec_id)
-        if g.locked:
-            continue
 
         # Tries to complete a possible exchange by offering other goods
         goods_in_exchange = """

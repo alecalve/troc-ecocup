@@ -38,9 +38,8 @@ class ExchangeMetadata(db.Model):
     giver = db.relationship("User", foreign_keys="ExchangeMetadata.giver_id")
     receiver = db.relationship("User", foreign_keys="ExchangeMetadata.receiver_id")
 
-    def __init__(self, giver, receiver):
+    def __init__(self, giver):
         self.giver_id = giver
-        self.receiver_id = receiver
         self.date_creation = datetime.datetime.now()
 
     def __repr__(self):
@@ -79,38 +78,6 @@ class Good(db.Model):
 
     def __repr__(self):
         return '<Good %r>' % self.id
-
-
-class Collection(db.Model):
-    """
-    Collection represents what the users have.
-    In order for announces to be valid, the announcer MUST have the goods
-    he wishes to exchange, if a user loses a good, any announce tied to it
-    becomes invalid
-    """
-
-    id = db.Column(db.Integer(), primary_key=True)
-    login_user = db.Column(db.String(8), db.ForeignKey('user.login'), index=True)
-    good_id = db.Column(db.Integer(), db.ForeignKey('good.id'), index=True)
-    # value represents how many distinct other goods the user wants in exchange of this one
-    # or how many distinct good he is ready to give away to get it
-    value = db.Column(db.Integer(), default=1)
-    has_it = db.Column(db.Boolean(), default=False)
-    wishes_it = db.Column(db.Boolean(), default=False)
-    # A good is locked when an exchange is pending
-    locked = db.Column(db.Boolean(), default=False)
-    created_at = db.Column(db.DateTime(), default=datetime.datetime.now())
-    date_given = db.Column(db.DateTime(), default=None)
-
-    good = db.relationship("Good")
-
-    def __init__(self, login_user, good):
-        self.login_user = login_user
-        self.good_id = good
-
-    def __repr__(self):
-        return '<Collection %r>' % self.id
-
 
 class Like(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
